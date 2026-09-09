@@ -1,0 +1,85 @@
+<!-- caminho: public/login/index.html -->
+
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Login - WhatsApp Bot</title>
+
+    <link
+        rel="stylesheet"
+        href="/login/style.css"
+    >
+
+</head>
+
+<body>
+
+    <main class="login-page">
+
+        <div class="login-card">
+
+            <h1>WhatsApp Bot</h1>
+
+            <p class="subtitle">
+                Acesso protegido
+            </p>
+
+            <form id="login-form">
+
+                <label for="username">
+                    Login
+                </label>
+
+                <input
+                    id="username"
+                    type="text"
+                    placeholder="Digite seu login"
+                    autocomplete="username"
+                    required
+                >
+
+                <label for="password">
+                    Senha
+                </label>
+
+                <input
+                    id="password"
+                    type="password"
+                    placeholder="Digite sua senha"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <button
+                    id="login-button"
+                    type="submit"
+                >
+                    Entrar
+                </button>
+
+            </form>
+
+            <p id="result"></p>
+
+        </div>
+
+    </main>
+
+    <script
+        src="/login/login.js"
+        type="module"
+    ></script>
+
+</body>
+
+</html>

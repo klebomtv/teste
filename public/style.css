@@ -1,0 +1,176 @@
+/* caminho: public/style.css */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  color: #222;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h1 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+h2 {
+  margin-top: 25px;
+}
+
+#status {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+#qr {
+  display: block;
+  width: 300px;
+  max-width: 100%;
+  height: auto;
+  margin: 20px auto;
+}
+
+#qr-container p {
+  color: #666;
+}
+
+.connected-text {
+  color: #2e7d32;
+  margin-bottom: 30px;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin-top: 15px;
+  margin-bottom: 7px;
+  font-weight: bold;
+}
+
+select,
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+}
+
+select {
+  background: #ffffff;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 13px;
+  border: none;
+  border-radius: 6px;
+  background: #222;
+  color: #ffffff;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.result {
+  margin-top: 15px;
+  min-height: 20px;
+  color: #555;
+}
+
+#start-container {
+  width: 100%;
+}
+
+#start-whatsapp {
+  margin-top: 10px;
+}
+
+
+/* ==========================================
+   PAINEL
+========================================== */
+
+.panel-card {
+  padding-top: 55px;
+}
+
+
+/* ==========================================
+   BOTÃO DE LOGOUT
+========================================== */
+
+.logout-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+
+  width: auto;
+
+  margin: 0;
+  padding: 8px 14px;
+
+  background: #c62828;
+
+  font-size: 13px;
+  font-weight: bold;
+
+  border-radius: 6px;
+}
+
+.logout-button:hover {
+  background: #b71c1c;
+}
+
+
+/* ==========================================
+   BOTÃO DE CANCELAR ENVIO
+========================================== */
+
+.cancel-button {
+  margin-top: 10px;
+  background: #d32f2f;
+  font-weight: bold;
+}
+
+.cancel-button:hover {
+  background: #c62828;
+}

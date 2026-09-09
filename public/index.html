@@ -1,0 +1,193 @@
+<!-- caminho: public/index.html -->
+
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+```
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>WhatsApp Bot</title>
+
+<link
+    rel="stylesheet"
+    href="/style.css"
+>
+```
+
+</head>
+
+<body>
+
+```
+<!-- ==========================================
+     PÁGINA DE CONEXÃO
+=========================================== -->
+
+<div
+    id="connection-page"
+    class="page"
+>
+
+    <div class="card">
+
+        <h1>WhatsApp Bot</h1>
+
+        <p id="status">
+            WhatsApp está parado.
+        </p>
+
+
+        <!-- BOTÃO PARA INICIAR -->
+
+        <div id="start-container">
+
+            <button id="start-whatsapp">
+                Iniciar WhatsApp
+            </button>
+
+        </div>
+
+
+        <!-- QR CODE -->
+
+        <div
+            id="qr-container"
+            style="display: none;"
+        >
+
+            <h2>
+                Escaneie o QR Code
+            </h2>
+
+            <img
+                id="qr"
+                src=""
+                alt="QR Code"
+            >
+
+            <p>
+                Abra o WhatsApp no celular
+                e escaneie o código.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==========================================
+     PAINEL
+=========================================== -->
+
+<div
+    id="panel-page"
+    class="page"
+    style="display: none;"
+>
+
+    <div class="card panel-card">
+
+
+        <!-- LOGOUT -->
+
+        <button
+            id="logout"
+            class="logout-button"
+        >
+            Logout
+        </button>
+
+
+        <h1>Painel</h1>
+
+        <p class="connected-text">
+            WhatsApp conectado
+        </p>
+
+
+        <!-- GRUPO -->
+
+        <label for="group">
+            Grupo
+        </label>
+
+        <select id="group">
+
+            <option value="all">
+                Todos os grupos
+            </option>
+
+        </select>
+
+
+        <!-- MENSAGEM -->
+
+        <label for="message">
+            Mensagem
+        </label>
+
+        <textarea
+            id="message"
+            placeholder="Digite sua mensagem..."
+            rows="6"
+        ></textarea>
+
+
+        <!-- BOTÃO DE ENVIO -->
+
+        <button id="send">
+            Enviar mensagem
+        </button>
+
+
+        <!-- BOTÃO DE CANCELAMENTO -->
+
+        <button
+            id="cancel-send"
+            class="cancel-button"
+            style="display: none;"
+        >
+            Cancelar envio
+        </button>
+
+
+        <!-- RESULTADO -->
+
+        <div
+            id="result"
+            class="result"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- SOCKET.IO -->
+
+<script
+    src="/socket.io/socket.io.js"
+></script>
+
+
+<!-- APP -->
+
+<script
+    src="/app.js"
+    type="module"
+></script>
+```
+
+</body>
+
+</html>
