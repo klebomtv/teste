@@ -1,4 +1,3 @@
-```js
 // caminho: public/login/login.js
 
 const form = document.getElementById('login-form')
@@ -49,4 +48,3 @@ form.addEventListener('submit', async (event) => {
         button.disabled = false
     }
 })
-```
