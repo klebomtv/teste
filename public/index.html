@@ -6,187 +6,127 @@
 
 <head>
 
-```
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-<title>WhatsApp Bot</title>
+    <title>
+        WhatsApp Bot
+    </title>
 
-<link
-    rel="stylesheet"
-    href="/style.css"
->
-```
+    <link
+        rel="stylesheet"
+        href="/style.css"
+    >
 
 </head>
 
 <body>
 
-```
-<!-- ==========================================
-     PÁGINA DE CONEXÃO
-=========================================== -->
+    <main
+        id="start-page"
+        class="page"
+    >
 
-<div
-    id="connection-page"
-    class="page"
->
+        <section
+            class="card start-card"
+        >
 
-    <div class="card">
+            <h1>
+                WhatsApp Bot
+            </h1>
 
-        <h1>WhatsApp Bot</h1>
-
-        <p id="status">
-            WhatsApp está parado.
-        </p>
-
-
-        <!-- BOTÃO PARA INICIAR -->
-
-        <div id="start-container">
-
-            <button id="start-whatsapp">
-                Iniciar WhatsApp
+            <button
+                id="start-whatsapp"
+                type="button"
+            >
+                Gerar QR Code
             </button>
 
-        </div>
+        </section>
 
+    </main>
 
-        <!-- QR CODE -->
+    <main
+        id="qr-page"
+        class="page"
+        style="display: none;"
+    >
 
-        <div
-            id="qr-container"
-            style="display: none;"
+        <section
+            class="card qr-card"
         >
 
-            <h2>
-                Escaneie o QR Code
-            </h2>
+            <h1>
+                Conectar WhatsApp
+            </h1>
 
-            <img
-                id="qr"
-                src=""
-                alt="QR Code"
-            >
-
-            <p>
-                Abra o WhatsApp no celular
-                e escaneie o código.
+            <p class="description">
+                Escaneie o QR Code com seu WhatsApp.
             </p>
 
-        </div>
+            <div
+                id="qr-container"
+                class="qr-container"
+            >
 
-    </div>
+                <div
+                    id="qr-content"
+                    class="qr-content"
+                >
 
-</div>
+                    <span>
+                        Aguardando QR Code...
+                    </span>
 
+                </div>
 
-<!-- ==========================================
-     PAINEL
-=========================================== -->
+            </div>
 
-<div
-    id="panel-page"
-    class="page"
-    style="display: none;"
->
+            <p
+                id="qr-status"
+                class="qr-status"
+            >
+                Aguardando geração do QR Code...
+            </p>
 
-    <div class="card panel-card">
+        </section>
 
+    </main>
 
-        <!-- LOGOUT -->
+    <main
+        id="panel-page"
+        class="page"
+        style="display: none;"
+    >
 
-        <button
-            id="logout"
-            class="logout-button"
+        <section
+            class="card panel-card"
         >
-            Logout
-        </button>
 
+            <h1>
+                WhatsApp Bot
+            </h1>
 
-        <h1>Painel</h1>
+            <p>
+                WhatsApp conectado.
+            </p>
 
-        <p class="connected-text">
-            WhatsApp conectado
-        </p>
+        </section>
 
+    </main>
 
-        <!-- GRUPO -->
+    <script
+        src="/socket.io/socket.io.js"
+    ></script>
 
-        <label for="group">
-            Grupo
-        </label>
-
-        <select id="group">
-
-            <option value="all">
-                Todos os grupos
-            </option>
-
-        </select>
-
-
-        <!-- MENSAGEM -->
-
-        <label for="message">
-            Mensagem
-        </label>
-
-        <textarea
-            id="message"
-            placeholder="Digite sua mensagem..."
-            rows="6"
-        ></textarea>
-
-
-        <!-- BOTÃO DE ENVIO -->
-
-        <button id="send">
-            Enviar mensagem
-        </button>
-
-
-        <!-- BOTÃO DE CANCELAMENTO -->
-
-        <button
-            id="cancel-send"
-            class="cancel-button"
-            style="display: none;"
-        >
-            Cancelar envio
-        </button>
-
-
-        <!-- RESULTADO -->
-
-        <div
-            id="result"
-            class="result"
-        ></div>
-
-    </div>
-
-</div>
-
-
-<!-- SOCKET.IO -->
-
-<script
-    src="/socket.io/socket.io.js"
-></script>
-
-
-<!-- APP -->
-
-<script
-    src="/app.js"
-    type="module"
-></script>
-```
+    <script
+        src="/app.js"
+        type="module"
+    ></script>
 
 </body>
 

@@ -1,3 +1,4 @@
+
 // caminho: index.js
 
 require('dotenv').config()
@@ -33,6 +34,16 @@ const setupSocket =
 
 const setupAuthRoutes =
     require('./auth/routes')
+
+
+const {
+    requireAuth
+} =
+    require('./src/auth/middleware')
+
+
+const createMessageSystem =
+    require('./src/painel/messages')
 
 
 /*
@@ -73,10 +84,37 @@ app.use(
 
 
 /*
+ * Sistema de autenticação
+ * do painel.
+ */
+
+const auth =
+    setupAuthRoutes(
+        app
+    )
+
+
+/*
+ * Proteção das rotas
+ * do painel.
+ *
+ * Tudo que estiver dentro
+ * de /painel será protegido.
+ */
+
+app.use(
+    '/painel',
+    requireAuth(
+        auth
+    )
+)
+
+
+/*
  * Arquivos públicos.
  *
- * O acesso ao painel é controlado
- * pelas rotas de autenticação.
+ * Os arquivos do painel já passaram
+ * pela proteção acima.
  */
 
 app.use(
@@ -92,11 +130,33 @@ app.use(
 )
 
 
-const auth =
-    setupAuthRoutes(
-        app
-    )
+/*
+ * Página do painel.
+ */
 
+app.get(
+    '/painel/',
+    (req, res) => {
+
+        res.sendFile(
+            path.join(
+                __dirname,
+                'public',
+                'painel',
+                'index.html'
+            )
+        )
+
+    }
+)
+
+
+/*
+ * Sistema WhatsApp.
+ *
+ * Toda a lógica está
+ * dentro de src/whatsapp/.
+ */
 
 const whatsapp =
     createWhatsApp(
@@ -104,10 +164,34 @@ const whatsapp =
     )
 
 
+/*
+ * Sistema de mensagens
+ * do painel.
+ *
+ * Responsável pela fila,
+ * intervalo entre grupos
+ * e proteção contra múltiplos envios.
+ */
+
+const messages =
+    createMessageSystem(
+        whatsapp,
+        io
+    )
+
+
+/*
+ * Socket.IO.
+ *
+ * Responsável pela comunicação
+ * entre navegador e servidor.
+ */
+
 setupSocket(
     io,
     whatsapp,
-    auth
+    auth,
+    messages
 )
 
 
@@ -123,5 +207,7 @@ server.listen(
         console.log(
             'WhatsApp aguardando inicialização pelo painel.'
         )
+
     }
 )
+

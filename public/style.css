@@ -1,127 +1,165 @@
-/* caminho: public/style.css */
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
 
 body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f4f4;
-  color: #222;
+    margin: 0;
+    padding: 0;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    background:
+        #f4f4f4;
+
+    color:
+        #222;
 }
+
+
+/* ==========================================
+   PÁGINAS
+========================================== */
 
 .page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+    width: 100%;
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
 }
+
+
+/* ==========================================
+   CARD
+========================================== */
 
 .card {
-  position: relative;
-  width: 100%;
-  max-width: 500px;
-  background: #ffffff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  text-align: center;
+    width: 100%;
+    max-width: 500px;
+
+    padding: 30px;
+
+    background:
+        #ffffff;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 5px 20px
+        rgba(
+            0,
+            0,
+            0,
+            0.10
+        );
+
+    text-align: center;
 }
+
+
+/* ==========================================
+   TÍTULO
+========================================== */
 
 h1 {
-  margin-top: 0;
-  margin-bottom: 10px;
+    margin: 0 0 10px;
 }
 
-h2 {
-  margin-top: 25px;
+
+/* ==========================================
+   DESCRIÇÃO
+========================================== */
+
+.description {
+    margin: 0;
+
+    color:
+        #666;
 }
 
-#status {
-  color: #666;
-  margin-bottom: 20px;
+
+/* ==========================================
+   ÁREA DO QR
+========================================== */
+
+.qr-container {
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    margin: 25px 0;
 }
 
-#qr {
-  display: block;
-  width: 300px;
-  max-width: 100%;
-  height: auto;
-  margin: 20px auto;
+
+/* ==========================================
+   CONTEÚDO DO QR
+========================================== */
+
+.qr-content {
+    width: 300px;
+    height: 300px;
+
+    max-width: 100%;
+    max-height: 300px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    background:
+        #dddddd;
+
+    border:
+        2px solid #999999;
+
+    border-radius: 6px;
 }
 
-#qr-container p {
-  color: #666;
+
+/* ==========================================
+   IMAGEM DO QR
+========================================== */
+
+.qr-content img {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
 }
 
-.connected-text {
-  color: #2e7d32;
-  margin-bottom: 30px;
-}
 
-label {
-  display: block;
-  text-align: left;
-  margin-top: 15px;
-  margin-bottom: 7px;
-  font-weight: bold;
-}
+/* ==========================================
+   STATUS DO QR
+========================================== */
 
-select,
-textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-family: Arial, sans-serif;
-  font-size: 15px;
-}
+.qr-status {
+    margin: 0;
 
-select {
-  background: #ffffff;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 120px;
-}
-
-button {
-  width: 100%;
-  margin-top: 20px;
-  padding: 13px;
-  border: none;
-  border-radius: 6px;
-  background: #222;
-  color: #ffffff;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.result {
-  margin-top: 15px;
-  min-height: 20px;
-  color: #555;
-}
-
-#start-container {
-  width: 100%;
-}
-
-#start-whatsapp {
-  margin-top: 10px;
+    color:
+        #666;
 }
 
 
@@ -130,47 +168,70 @@ button:disabled {
 ========================================== */
 
 .panel-card {
-  padding-top: 55px;
+    position: relative;
 }
 
 
 /* ==========================================
-   BOTÃO DE LOGOUT
+   RESPONSIVIDADE
 ========================================== */
 
-.logout-button {
-  position: absolute;
-  top: 15px;
-  right: 15px;
+@media (
+    max-width: 600px
+) {
 
-  width: auto;
+    .page {
+        padding: 15px;
+    }
 
-  margin: 0;
-  padding: 8px 14px;
 
-  background: #c62828;
+    .card {
+        padding: 20px;
+    }
 
-  font-size: 13px;
-  font-weight: bold;
 
-  border-radius: 6px;
+    .qr-content {
+        width: 280px;
+        height: 280px;
+    }
+
 }
 
-.logout-button:hover {
-  background: #b71c1c;
+
+@media (
+    max-width: 350px
+) {
+
+    .card {
+        padding: 15px;
+    }
+
+
+    .qr-content {
+        width: 240px;
+        height: 240px;
+    }
+
 }
 
 
-/* ==========================================
-   BOTÃO DE CANCELAR ENVIO
-========================================== */
+/* caminho: public/style.css */
 
-.cancel-button {
-  margin-top: 10px;
-  background: #d32f2f;
-  font-weight: bold;
+#start-whatsapp {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 6px;
+    background: #222;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
 }
 
-.cancel-button:hover {
-  background: #c62828;
+#start-whatsapp:hover {
+    background: #333;
+}
+
+#start-whatsapp:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }

@@ -1,0 +1,190 @@
+```html
+<!-- caminho: public/painel/index.html -->
+
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        WhatsApp Bot
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="/painel/style.css"
+    >
+
+</head>
+
+<body>
+
+    <main
+        id="panel-page"
+        class="page"
+    >
+
+        <section
+            class="card panel-card"
+        >
+
+            <h1>
+                WhatsApp Bot
+            </h1>
+
+            <p
+                id="panel-status"
+                class="panel-status"
+            >
+                WhatsApp conectado.
+            </p>
+
+
+            <!--
+             * ==========================================
+             * MENSAGEM
+             * ==========================================
+             -->
+
+            <div
+                class="message-section"
+            >
+
+                <label
+                    for="message"
+                >
+                    Mensagem
+                </label>
+
+                <textarea
+                    id="message"
+                    rows="5"
+                    placeholder="Digite sua mensagem..."
+                ></textarea>
+
+            </div>
+
+
+            <!--
+             * ==========================================
+             * GRUPOS
+             * ==========================================
+             -->
+
+            <div
+                class="groups-section"
+            >
+
+                <div
+                    class="groups-header"
+                >
+
+                    <span>
+                        Grupos
+                    </span>
+
+                    <label
+                        class="select-all"
+                    >
+
+                        <input
+                            type="checkbox"
+                            id="select-all"
+                        >
+
+                        Enviar para todos
+
+                    </label>
+
+                </div>
+
+
+                <div
+                    id="groups"
+                    class="groups-list"
+                >
+
+                    <p
+                        class="groups-empty"
+                    >
+                        Carregando grupos...
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!--
+             * ==========================================
+             * ENVIO
+             * ==========================================
+             -->
+
+            <button
+                id="send-message"
+                type="button"
+            >
+                Enviar mensagem
+            </button>
+
+
+            <div
+                id="send-status"
+                class="send-status"
+            ></div>
+
+
+            <div
+                id="cooldown"
+                class="cooldown"
+                style="display: none;"
+            >
+
+                Próximo envio em:
+
+                <strong
+                    id="cooldown-time"
+                >
+                    30s
+                </strong>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script
+        src="/socket.io/socket.io.js"
+    ></script>
+
+    <script
+        src="/painel/js/cooldown.js"
+    ></script>
+
+    <script
+        src="/painel/js/groups.js"
+    ></script>
+
+    <script
+        src="/painel/js/messages.js"
+    ></script>
+
+    <script
+        src="/painel/js/panel.js"
+    ></script>
+
+</body>
+
+</html>
+```
