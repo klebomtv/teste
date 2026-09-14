@@ -1,3 +1,4 @@
+
 // caminho: src/whatsapp/connection.js
 
 const {
@@ -12,6 +13,10 @@ const pino =
         'pino'
     )
 
+
+// Logger exclusivo do Baileys.
+// Mantém os logs da aplicação normalmente,
+// mas bloqueia os logs internos do Baileys.
 const logger =
     pino(
         {
@@ -20,6 +25,7 @@ const logger =
         }
     )
 
+
 function createConnection(
     auth
 ) {
@@ -27,6 +33,7 @@ function createConnection(
     console.log(
         '[WHATSAPP CONNECTION] Criando conexão Baileys.'
     )
+
 
     const sock =
         makeWASocket({
@@ -42,8 +49,11 @@ function createConnection(
 
         })
 
+
     return sock
+
 }
+
 
 module.exports = {
     createConnection
