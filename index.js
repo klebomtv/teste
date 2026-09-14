@@ -1,4 +1,3 @@
-
 // caminho: index.js
 
 require('dotenv').config()
@@ -42,15 +41,10 @@ const {
     require('./src/auth/middleware')
 
 
-const createMessageSystem =
-    require('./src/painel/messages')
-
-
 /*
- * Preparação do sistema.
- *
- * Executado somente quando
- * o processo Node.js é iniciado.
+ * ==========================================
+ * INICIALIZAÇÃO
+ * ==========================================
  */
 
 initializeSystem()
@@ -84,8 +78,9 @@ app.use(
 
 
 /*
- * Sistema de autenticação
- * do painel.
+ * ==========================================
+ * AUTENTICAÇÃO
+ * ==========================================
  */
 
 const auth =
@@ -95,26 +90,12 @@ const auth =
 
 
 /*
- * Proteção das rotas
- * do painel.
+ * ==========================================
+ * ARQUIVOS PÚBLICOS
+ * ==========================================
  *
- * Tudo que estiver dentro
- * de /painel será protegido.
- */
-
-app.use(
-    '/painel',
-    requireAuth(
-        auth
-    )
-)
-
-
-/*
- * Arquivos públicos.
- *
- * Os arquivos do painel já passaram
- * pela proteção acima.
+ * Login, 404 e página inicial
+ * continuam disponíveis.
  */
 
 app.use(
@@ -131,7 +112,23 @@ app.use(
 
 
 /*
- * Página do painel.
+ * ==========================================
+ * PROTEÇÃO DO PAINEL
+ * ==========================================
+ */
+
+app.use(
+    '/painel',
+    requireAuth(
+        auth
+    )
+)
+
+
+/*
+ * ==========================================
+ * PÁGINA DO PAINEL
+ * ==========================================
  */
 
 app.get(
@@ -152,56 +149,37 @@ app.get(
 
 
 /*
- * Sistema WhatsApp.
- *
- * Toda a lógica está
- * dentro de src/whatsapp/.
+ * ==========================================
+ * WHATSAPP
+ * ==========================================
  */
 
 const whatsapp =
-    createWhatsApp(
-        io
-    )
+    createWhatsApp()
 
 
 /*
- * Sistema de mensagens
- * do painel.
+ * ==========================================
+ * SOCKET.IO
+ * ==========================================
  *
- * Responsável pela fila,
- * intervalo entre grupos
- * e proteção contra múltiplos envios.
- */
-
-const messages =
-    createMessageSystem(
-        whatsapp,
-        io
-    )
-
-
-/*
- * Socket.IO.
- *
- * Responsável pela comunicação
+ * O Socket.IO agora fica responsável
+ * somente pela comunicação necessária
  * entre navegador e servidor.
  */
 
 setupSocket(
     io,
-    whatsapp,
-    auth,
-    messages
+    auth
 )
 
 
 /*
  * ==========================================
- * PÁGINA 404
+ * 404
  * ==========================================
  *
- * Este middleware precisa ficar
- * depois de todas as rotas.
+ * Deve ficar por último.
  */
 
 app.use(
@@ -246,4 +224,3 @@ server.listen(
 
     }
 )
-
