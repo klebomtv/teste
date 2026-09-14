@@ -6,22 +6,12 @@ const groupsContainer =
         'groups'
     )
 
-
 const selectAll =
     document.getElementById(
         'select-all'
     )
 
-
-let availableGroups =
-    []
-
-
-/*
- * ==========================================
- * RECEBER GRUPOS
- * ==========================================
- */
+let availableGroups = []
 
 function setGroups(
     groups
@@ -31,7 +21,6 @@ function setGroups(
         '[PAINEL GROUPS] Grupos recebidos:',
         groups
     )
-
 
     if (
         !Array.isArray(
@@ -43,36 +32,23 @@ function setGroups(
             '[PAINEL GROUPS] Os grupos recebidos não são um array.'
         )
 
-        availableGroups =
-            []
+        availableGroups = []
 
         renderGroups()
 
         return
-
     }
-
 
     availableGroups =
         groups
-
 
     console.log(
         '[PAINEL GROUPS] Total de grupos:',
         availableGroups.length
     )
 
-
     renderGroups()
-
 }
-
-
-/*
- * ==========================================
- * RENDERIZAR GRUPOS
- * ==========================================
- */
 
 function renderGroups() {
 
@@ -81,17 +57,13 @@ function renderGroups() {
     ) {
 
         console.error(
-            '[PAINEL GROUPS] Container de grupos não encontrado.'
+            '[PAINEL GROUPS] Elemento #groups não encontrado no HTML.'
         )
 
         return
-
     }
 
-
-    groupsContainer.innerHTML =
-        ''
-
+    groupsContainer.innerHTML = ''
 
     if (
         availableGroups.length === 0
@@ -102,24 +74,18 @@ function renderGroups() {
                 'p'
             )
 
-
         empty.className =
             'groups-empty'
 
-
         empty.textContent =
             'Nenhum grupo encontrado.'
-
 
         groupsContainer.appendChild(
             empty
         )
 
-
         return
-
     }
-
 
     availableGroups.forEach(
         group => {
@@ -128,76 +94,59 @@ function renderGroups() {
                 !group ||
                 !group.id
             ) {
-
                 return
-
             }
-
 
             const label =
                 document.createElement(
                     'label'
                 )
 
-
             label.className =
                 'group-item'
-
 
             const checkbox =
                 document.createElement(
                     'input'
                 )
 
-
             checkbox.type =
                 'checkbox'
-
 
             checkbox.className =
                 'group-checkbox'
 
-
             checkbox.value =
                 group.id
-
 
             const name =
                 document.createElement(
                     'span'
                 )
 
-
             name.textContent =
                 group.name ||
                 'Grupo sem nome'
-
 
             label.appendChild(
                 checkbox
             )
 
-
             label.appendChild(
                 name
             )
 
-
             groupsContainer.appendChild(
                 label
             )
-
         }
     )
 
+    console.log(
+        '[PAINEL GROUPS] Grupos renderizados no HTML:',
+        groupsContainer.children.length
+    )
 }
-
-
-/*
- * ==========================================
- * OBTER GRUPOS SELECIONADOS
- * ==========================================
- */
 
 function getSelectedGroups() {
 
@@ -209,15 +158,12 @@ function getSelectedGroups() {
         return [
             ...availableGroups
         ]
-
     }
-
 
     const checkboxes =
         document.querySelectorAll(
             '.group-checkbox:checked'
         )
-
 
     return Array.from(
         checkboxes
@@ -230,21 +176,12 @@ function getSelectedGroups() {
                     group.id ===
                     checkbox.value
             )
-
         }
     )
     .filter(
         Boolean
     )
-
 }
-
-
-/*
- * ==========================================
- * SELECIONAR TODOS
- * ==========================================
- */
 
 function setAllGroups(
     checked
@@ -255,24 +192,14 @@ function setAllGroups(
             '.group-checkbox'
         )
 
-
     checkboxes.forEach(
         checkbox => {
 
             checkbox.checked =
                 checked
-
         }
     )
-
 }
-
-
-/*
- * ==========================================
- * EVENTO ENVIAR PARA TODOS
- * ==========================================
- */
 
 if (
     selectAll
@@ -287,22 +214,12 @@ if (
                 selectAll.checked
             )
 
-
             setAllGroups(
                 selectAll.checked
             )
-
         }
     )
-
 }
-
-
-/*
- * ==========================================
- * API DO PAINEL
- * ==========================================
- */
 
 window.panelGroups = {
 
@@ -311,10 +228,9 @@ window.panelGroups = {
 
     getSelected:
         getSelectedGroups
-
 }
-
 
 console.log(
     '[PAINEL GROUPS] Módulo de grupos carregado.'
 )
+

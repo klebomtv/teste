@@ -1,38 +1,62 @@
 
 // caminho: public/painel/js/panel.js
 
-const panelSocket =
-    window.panelSocket
-
-
 const panelStatus =
     document.getElementById(
         'panel-status'
     )
 
+const panelSocket =
+    window.panelSocket
 
-/*
- * ==========================================
- * VALIDAR SOCKET
- * ==========================================
- */
+function updateStatus(
+    text
+) {
+
+    if (
+        panelStatus
+    ) {
+
+        panelStatus.textContent =
+            text
+    }
+}
+
+function requestGroups() {
+
+    if (
+        !panelSocket
+    ) {
+
+        console.error(
+            '[PAINEL] Socket não encontrado.'
+        )
+
+        return
+    }
+
+    console.log(
+        '[PAINEL] Solicitando grupos.'
+    )
+
+    panelSocket.emit(
+        'request-groups'
+    )
+}
 
 if (
     !panelSocket
 ) {
 
     console.error(
-        '[PAINEL] Socket do painel não encontrado.'
+        '[PAINEL] window.panelSocket não existe.'
     )
 
 } else {
 
-
-    /*
-     * ==========================================
-     * SOCKET CONECTADO
-     * ==========================================
-     */
+    console.log(
+        '[PAINEL] Socket encontrado.'
+    )
 
     panelSocket.on(
         'connect',
@@ -42,25 +66,9 @@ if (
                 '[PAINEL] Socket conectado.'
             )
 
-
-            console.log(
-                '[PAINEL] Solicitando grupos.'
-            )
-
-
-            panelSocket.emit(
-                'request-groups'
-            )
-
+            requestGroups()
         }
     )
-
-
-    /*
-     * ==========================================
-     * ESTADO DO WHATSAPP
-     * ==========================================
-     */
 
     panelSocket.on(
         'whatsapp-state',
@@ -71,26 +79,20 @@ if (
                 state
             )
 
-
             if (
                 !state
             ) {
-
                 return
-
             }
 
-
             if (
-                panelStatus &&
                 state.status
             ) {
 
-                panelStatus.textContent =
+                updateStatus(
                     state.status
-
+                )
             }
-
 
             if (
                 Array.isArray(
@@ -103,32 +105,25 @@ if (
                     state.groups.length
                 )
 
+                if (
+                    window.panelGroups
+                ) {
 
-                panelGroups.set(
-                    state.groups
-                )
-
+                    window.panelGroups.set(
+                        state.groups
+                    )
+                }
             }
-
         }
     )
-
-
-    /*
-     * ==========================================
-     * RECEBER GRUPOS
-     * ==========================================
-     */
 
     panelSocket.on(
         'groups',
         groups => {
 
             console.log(
-                '[PAINEL] Grupos recebidos:',
-                groups
+                '[PAINEL] Evento groups recebido.'
             )
-
 
             if (
                 !Array.isArray(
@@ -137,33 +132,27 @@ if (
             ) {
 
                 console.error(
-                    '[PAINEL] Grupos recebidos não são um array.'
+                    '[PAINEL] Grupos não são um array.'
                 )
 
                 return
-
             }
 
-
             console.log(
-                '[PAINEL] Total de grupos recebidos:',
+                '[PAINEL] Total de grupos:',
                 groups.length
             )
 
+            if (
+                window.panelGroups
+            ) {
 
-            panelGroups.set(
-                groups
-            )
-
+                window.panelGroups.set(
+                    groups
+                )
+            }
         }
     )
-
-
-    /*
-     * ==========================================
-     * STATUS WHATSAPP
-     * ==========================================
- */
 
     panelSocket.on(
         'connected',
@@ -176,23 +165,30 @@ if (
                     : 'desconectado'
             )
 
-
-            if (
-                panelStatus
-            ) {
-
-                panelStatus.textContent =
-                    connected
-                        ? 'WhatsApp conectado.'
-                        : 'WhatsApp desconectado.'
-
-            }
-
+            updateStatus(
+                connected
+                    ? 'WhatsApp conectado.'
+                    : 'WhatsApp desconectado.'
+            )
         }
     )
 
-}
+    /*
+     * Caso o socket já esteja conectado
+     * antes deste arquivo ser executado.
+     */
 
+    if (
+        panelSocket.connected
+    ) {
+
+        console.log(
+            '[PAINEL] Socket já conectado.'
+        )
+
+        requestGroups()
+    }
+}
 
 console.log(
     '[PAINEL] Painel carregado.'
