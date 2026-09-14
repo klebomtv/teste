@@ -747,6 +747,150 @@ function createWhatsApp(
     }
 
 
+    async function sendToSelected(
+        selectedIds,
+        message
+    ) {
+
+        const sock =
+            state.getSocket()
+
+
+        if (
+            !state.isConnected()
+        ) {
+
+            throw new Error(
+                'WhatsApp não está conectado.'
+            )
+        }
+
+
+        if (
+            state.isSending()
+        ) {
+
+            throw new Error(
+                'Já existe um envio em andamento.'
+            )
+        }
+
+
+        if (
+            !Array.isArray(
+                selectedIds
+            ) ||
+            !selectedIds.length
+        ) {
+
+            throw new Error(
+                'Nenhum grupo selecionado.'
+            )
+        }
+
+
+        const allGroups =
+            state.getGroups()
+
+
+        const selectedGroups =
+            allGroups.filter(
+                group =>
+                    selectedIds.includes(
+                        group.id
+                    )
+            )
+
+
+        if (
+            !selectedGroups.length
+        ) {
+
+            throw new Error(
+                'Nenhum grupo selecionado foi encontrado.'
+            )
+        }
+
+
+        state.setSending(
+            true
+        )
+
+
+        state.setCancelSending(
+            false
+        )
+
+
+        io?.emit(
+            'send-started',
+            {
+                total:
+                    selectedGroups.length
+            }
+        )
+
+
+        try {
+
+            const result =
+                await messages.sendToGroups(
+                    sock,
+                    selectedGroups,
+                    message,
+                    () =>
+                        state.shouldCancelSending(),
+
+                    progress => {
+
+                        io?.emit(
+                            'send-progress',
+                            progress
+                        )
+                    }
+                )
+
+
+            if (
+                result.cancelled
+            ) {
+
+                io?.emit(
+                    'send-cancelled',
+                    result
+                )
+
+            } else {
+
+                io?.emit(
+                    'send-finished',
+                    result
+                )
+            }
+
+
+            return result
+
+        } finally {
+
+            state.setSending(
+                false
+            )
+
+
+            state.setCancelSending(
+                false
+            )
+
+
+            io?.emit(
+                'whatsapp-state',
+                state.getState()
+            )
+        }
+    }
+
+
     function cancelSending() {
 
         if (
@@ -805,6 +949,8 @@ function createWhatsApp(
         sendMessage,
 
         sendToAll,
+
+        sendToSelected,
 
         cancelSending
     }
