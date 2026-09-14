@@ -23,23 +23,165 @@
         Grupos
     </h1>
 
-    <select id="group">
-
-        <option value="">
-            Carregando grupos...
-        </option>
-
-    </select>
+    <div id="groups">
+        Carregando grupos...
+    </div>
 
 
     <script
         src="/socket.io/socket.io.js"
     ></script>
 
-    <script
-        type="module"
-        src="/painel/js/panel.js"
-    ></script>
+
+    <script>
+
+        const socket =
+            io()
+
+
+        const groupsContainer =
+            document.getElementById(
+                'groups'
+            )
+
+
+        function showGroups(
+            groups
+        ) {
+
+            console.log(
+                '[TESTE] Grupos recebidos:',
+                groups
+            )
+
+
+            if (
+                !Array.isArray(groups) ||
+                groups.length === 0
+            ) {
+
+                groupsContainer.innerHTML =
+                    '<p>Nenhum grupo encontrado.</p>'
+
+                return
+            }
+
+
+            groupsContainer.innerHTML = ''
+
+
+            groups.forEach(
+                group => {
+
+                    const item =
+                        document.createElement(
+                            'div'
+                        )
+
+
+                    item.textContent =
+                        group.name
+
+
+                    item.dataset.id =
+                        group.id
+
+
+                    groupsContainer.appendChild(
+                        item
+                    )
+
+                }
+            )
+
+        }
+
+
+        socket.on(
+            'connect',
+            () => {
+
+                console.log(
+                    '[TESTE] Socket conectado:',
+                    socket.id
+                )
+
+            }
+        )
+
+
+        socket.on(
+            'disconnect',
+            () => {
+
+                console.log(
+                    '[TESTE] Socket desconectado.'
+                )
+
+            }
+        )
+
+
+        socket.on(
+            'groups',
+            groups => {
+
+                console.log(
+                    '[TESTE] Evento groups recebido.'
+                )
+
+                showGroups(
+                    groups
+                )
+
+            }
+        )
+
+
+        socket.on(
+            'whatsapp-state',
+            state => {
+
+                console.log(
+                    '[TESTE] Estado recebido:',
+                    state
+                )
+
+
+                if (
+                    state &&
+                    Array.isArray(
+                        state.groups
+                    )
+                ) {
+
+                    showGroups(
+                        state.groups
+                    )
+
+                }
+
+            }
+        )
+
+
+        socket.on(
+            'auth-error',
+            data => {
+
+                console.error(
+                    '[TESTE] Erro de autenticação:',
+                    data
+                )
+
+
+                groupsContainer.innerHTML =
+                    '<p>Sessão não autenticada.</p>'
+
+            }
+        )
+
+    </script>
 
 </body>
 
