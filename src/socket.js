@@ -1,3 +1,4 @@
+
 // caminho: src/socket.js
 
 function setupSocket(
@@ -30,6 +31,12 @@ function setupSocket(
             )
 
 
+            /*
+             * ==========================================
+             * DIAGNÓSTICO ENGINE.IO
+             * ==========================================
+             */
+
             socket.conn.on(
                 'upgrade',
                 () => {
@@ -42,6 +49,38 @@ function setupSocket(
                 }
             )
 
+
+            socket.conn.on(
+                'close',
+                reason => {
+
+                    console.error(
+                        '[SOCKET SERVER] ENGINE.IO CLOSE:',
+                        reason
+                    )
+
+                }
+            )
+
+
+            socket.conn.on(
+                'error',
+                error => {
+
+                    console.error(
+                        '[SOCKET SERVER] ENGINE.IO ERROR:',
+                        error
+                    )
+
+                }
+            )
+
+
+            /*
+             * ==========================================
+             * AUTENTICAÇÃO DA SESSÃO
+             * ==========================================
+             */
 
             const cookies =
                 socket.handshake.headers.cookie || ''
@@ -98,11 +137,23 @@ function setupSocket(
             )
 
 
+            /*
+             * ==========================================
+             * ESTADO INICIAL DO WHATSAPP
+             * ==========================================
+             */
+
             socket.emit(
                 'whatsapp-state',
                 whatsapp.getState()
             )
 
+
+            /*
+             * ==========================================
+             * INICIAR WHATSAPP
+             * ==========================================
+             */
 
             socket.on(
                 'start-whatsapp',
@@ -157,12 +208,15 @@ function setupSocket(
             )
 
 
+            /*
+             * ==========================================
+             * DESCONEXÃO SOCKET.IO
+             * ==========================================
+             */
+
             socket.on(
                 'disconnect',
-                (
-                    reason,
-                    details
-                ) => {
+                reason => {
 
                     console.log(
                         '======================================'
@@ -183,8 +237,23 @@ function setupSocket(
                     )
 
                     console.log(
-                        '[SOCKET SERVER] Detalhes:',
-                        details
+                        '[SOCKET SERVER] Connected:',
+                        socket.connected
+                    )
+
+                    console.log(
+                        '[SOCKET SERVER] Transport:',
+                        socket.conn?.transport?.name
+                    )
+
+                    console.log(
+                        '[SOCKET SERVER] Handshake URL:',
+                        socket.handshake?.url
+                    )
+
+                    console.log(
+                        '[SOCKET SERVER] User-Agent:',
+                        socket.handshake?.headers?.['user-agent']
                     )
 
                     console.log(
@@ -194,6 +263,12 @@ function setupSocket(
                 }
             )
 
+
+            /*
+             * ==========================================
+             * ERRO DE DESCONEXÃO
+             * ==========================================
+             */
 
             socket.on(
                 'disconnect_error',
