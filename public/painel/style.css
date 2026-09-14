@@ -1,415 +1,417 @@
-
 /* caminho: public/painel/style.css */
 
 * {
     box-sizing: border-box;
 }
 
-
-body {
-
-    margin: 0;
-
-    min-height: 100vh;
-
+:root {
     font-family:
-        Arial,
-        Helvetica,
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
         sans-serif;
 
-    background:
-        #f4f6f8;
+    color: #f1f5f9;
+    background: #080b10;
 
-    color:
-        #17202a;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
 }
 
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at 15% 10%,
+            rgba(37, 211, 102, 0.08),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 85% 90%,
+            rgba(59, 130, 246, 0.06),
+            transparent 30%
+        ),
+        #080b10;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+
+/* ========================================
+   LAYOUT
+======================================== */
 
 .panel {
-
-    width: min(
-        100% - 32px,
-        1000px
-    );
-
-    margin:
-        0 auto;
-
-    padding:
-        40px 0 60px;
+    width: min(1100px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 42px 0 60px;
 }
 
+
+/* ========================================
+   HEADER
+======================================== */
 
 .panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 30px;
 
-    display:
-        flex;
-
-    align-items:
-        flex-start;
-
-    justify-content:
-        space-between;
-
-    gap:
-        24px;
-
-    margin-bottom:
-        28px;
+    margin-bottom: 34px;
 }
-
 
 .eyebrow {
+    display: block;
 
-    display:
-        block;
+    margin-bottom: 8px;
 
-    margin-bottom:
-        8px;
+    color: #25d366;
 
-    font-size:
-        12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
 
-    font-weight:
-        700;
+.panel-header h1 {
+    margin: 0;
 
-    letter-spacing:
-        1.5px;
+    color: #f8fafc;
 
-    color:
-        #68737d;
+    font-size: clamp(32px, 5vw, 46px);
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+}
+
+.panel-header p {
+    margin: 12px 0 0;
+
+    color: #7f8a9a;
+
+    font-size: 15px;
 }
 
 
-h1 {
-
-    margin:
-        0;
-
-    font-size:
-        36px;
-
-    line-height:
-        1.1;
-}
-
-
-h2 {
-
-    margin:
-        0;
-
-    font-size:
-        21px;
-}
-
-
-p {
-
-    margin:
-        10px 0 0;
-
-    color:
-        #68737d;
-}
-
-
-.status-grid {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(
-            2,
-            minmax(
-                0,
-                1fr
-            )
-        );
-
-    gap:
-        16px;
-
-    margin-bottom:
-        20px;
-}
-
-
-.status-card,
-.panel-card {
-
-    background:
-        #ffffff;
-
-    border:
-        1px solid #e2e6ea;
-
-    border-radius:
-        14px;
-
-    box-shadow:
-        0 4px 18px
-        rgba(
-            0,
-            0,
-            0,
-            0.04
-        );
-}
-
-
-.status-card {
-
-    padding:
-        20px;
-}
-
-
-.status-card span {
-
-    display:
-        block;
-
-    margin-bottom:
-        8px;
-
-    font-size:
-        13px;
-
-    color:
-        #68737d;
-}
-
-
-.status-card strong {
-
-    font-size:
-        17px;
-}
-
-
-.panel-card {
-
-    padding:
-        28px;
-}
-
-
-.card-header {
-
-    margin-bottom:
-        28px;
-
-    padding-bottom:
-        20px;
-
-    border-bottom:
-        1px solid #edf0f2;
-}
-
-
-.form-group {
-
-    margin-bottom:
-        20px;
-}
-
-
-label {
-
-    display:
-        block;
-
-    margin-bottom:
-        8px;
-
-    font-size:
-        14px;
-
-    font-weight:
-        700;
-}
-
-
-select,
-textarea {
-
-    width:
-        100%;
-
-    border:
-        1px solid #d7dce0;
-
-    border-radius:
-        9px;
-
-    background:
-        #ffffff;
-
-    color:
-        #17202a;
-
-    font:
-        inherit;
-
-    outline:
-        none;
-}
-
-
-select {
-
-    height:
-        46px;
-
-    padding:
-        0 12px;
-}
-
-
-textarea {
-
-    resize:
-        vertical;
-
-    min-height:
-        140px;
-
-    padding:
-        13px;
-}
-
-
-select:focus,
-textarea:focus {
-
-    border-color:
-        #7d8790;
-
-}
-
-
-.actions {
-
-    display:
-        flex;
-
-    gap:
-        10px;
-
-    flex-wrap:
-        wrap;
-}
-
+/* ========================================
+   BUTTONS
+======================================== */
 
 .button {
+    min-height: 44px;
 
-    min-height:
-        44px;
+    padding: 0 18px;
 
-    padding:
-        0 18px;
+    border: 1px solid transparent;
+    border-radius: 10px;
 
-    border:
-        0;
+    font-size: 14px;
+    font-weight: 600;
 
-    border-radius:
-        9px;
-
-    font:
-        inherit;
-
-    font-weight:
-        700;
-
-    cursor:
-        pointer;
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        transform 0.18s ease,
+        opacity 0.18s ease;
 }
 
+.button:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
 
 .button-primary {
+    color: #041009;
 
-    background:
-        #17202a;
-
-    color:
-        #ffffff;
+    background: #25d366;
 }
 
+.button-primary:hover:not(:disabled) {
+    background: #20bd5b;
+}
 
 .button-secondary {
+    color: #cbd5e1;
 
-    background:
-        #e9edf0;
+    background: #11161e;
+    border-color: #242c38;
+}
 
-    color:
-        #17202a;
+.button-secondary:hover:not(:disabled) {
+    background: #171d27;
+    border-color: #354050;
 }
 
 
-.button:disabled {
+/* ========================================
+   STATUS
+======================================== */
 
-    opacity:
-        0.55;
+.status-grid {
+    display: grid;
 
-    cursor:
-        not-allowed;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 16px;
+
+    margin-bottom: 22px;
 }
 
+.status-card {
+    position: relative;
+
+    min-height: 92px;
+
+    padding: 20px 22px;
+
+    overflow: hidden;
+
+    background: #0e131a;
+    border: 1px solid #1c2430;
+    border-radius: 14px;
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.18);
+}
+
+.status-card::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 3px;
+
+    background: #25d366;
+}
+
+.status-card span {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #687386;
+
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.status-card strong {
+    display: block;
+
+    color: #e5e7eb;
+
+    font-size: 15px;
+    font-weight: 600;
+}
+
+
+/* ========================================
+   MAIN CARD
+======================================== */
+
+.panel-card {
+    padding: 28px;
+
+    background: rgba(14, 19, 26, 0.94);
+
+    border: 1px solid #1c2430;
+    border-radius: 16px;
+
+    box-shadow:
+        0 24px 70px rgba(0, 0, 0, 0.24);
+}
+
+.card-header {
+    margin-bottom: 26px;
+}
+
+.card-header h2 {
+    margin: 0;
+
+    color: #f8fafc;
+
+    font-size: 21px;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+}
+
+
+/* ========================================
+   FORM
+======================================== */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 9px;
+
+    color: #aab4c3;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.form-group select,
+.form-group textarea {
+    display: block;
+
+    width: 100%;
+
+    color: #e5e7eb;
+
+    background: #090d13;
+
+    border: 1px solid #252e3b;
+    border-radius: 10px;
+
+    outline: none;
+
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        background 0.18s ease;
+}
+
+.form-group select {
+    height: 48px;
+
+    padding: 0 14px;
+}
+
+.form-group textarea {
+    min-height: 150px;
+
+    padding: 14px;
+
+    resize: vertical;
+
+    line-height: 1.55;
+}
+
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #25d366;
+
+    background: #0b1016;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 211, 102, 0.09);
+}
+
+.form-group textarea::placeholder {
+    color: #4f5968;
+}
+
+
+/* ========================================
+   ACTIONS
+======================================== */
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-top: 26px;
+}
+
+.actions .button-primary {
+    min-width: 170px;
+}
+
+.actions .button-secondary {
+    min-width: 100px;
+}
+
+
+/* ========================================
+   RESULT
+======================================== */
 
 .result {
+    min-height: 22px;
 
-    min-height:
-        24px;
+    margin-top: 18px;
 
-    margin-top:
-        18px;
+    color: #7f8a9a;
 
-    font-size:
-        14px;
-
-    color:
-        #68737d;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 
-@media (
-    max-width: 700px
-) {
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 700px) {
 
     .panel {
+        width: min(100% - 24px, 1100px);
 
-        width:
-            min(
-                100% - 20px,
-                1000px
-            );
-
-        padding-top:
-            24px;
+        padding-top: 26px;
+        padding-bottom: 35px;
     }
-
 
     .panel-header {
+        flex-direction: column;
 
-        flex-direction:
-            column;
+        gap: 20px;
     }
 
+    .panel-header .button {
+        width: 100%;
+    }
 
     .status-grid {
-
-        grid-template-columns:
-            1fr;
+        grid-template-columns: 1fr;
     }
-
 
     .panel-card {
-
-        padding:
-            20px;
+        padding: 21px;
     }
 
-}
+    .actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
+    .actions .button-primary,
+    .actions .button-secondary {
+        width: 100%;
+    }
+}
