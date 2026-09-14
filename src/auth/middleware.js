@@ -6,7 +6,7 @@ const path =
 
 
 const auth =
-    require('./auth')
+    require('./auth/auth.js')
 
 
 function setupAuthRoutes(
