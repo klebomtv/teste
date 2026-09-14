@@ -1,5 +1,3 @@
-
-
 // caminho: src/whatsapp/messages.js
 
 async function sendMessage(
@@ -7,65 +5,39 @@ async function sendMessage(
     target,
     message
 ) {
-
     if (!sock) {
-
         throw new Error(
             'Socket do WhatsApp não disponível.'
         )
-
     }
 
-
     if (!target) {
-
         throw new Error(
             'Grupo não informado.'
         )
-
     }
-
 
     if (
         typeof message !== 'string' ||
         !message.trim()
     ) {
-
         throw new Error(
             'Mensagem não informada.'
         )
-
     }
-
 
     await sock.sendMessage(
         target,
         {
-            text:
-                message.trim()
+            text: message.trim()
         }
     )
 
-
     return {
-
-        success:
-            true,
-
+        success: true,
         target
-
     }
-
 }
-
-
-/*
- * Envia a mesma mensagem
- * para os grupos selecionados.
- *
- * Esta função não conhece Socket.IO.
- * Ela apenas executa o envio.
- */
 
 async function sendToGroups(
     sock,
@@ -74,53 +46,32 @@ async function sendToGroups(
     shouldCancel,
     onProgress
 ) {
-
     if (!Array.isArray(groups)) {
-
         throw new Error(
             'Lista de grupos inválida.'
         )
-
     }
 
-
-    let sent =
-        0
-
-    let failed =
-        0
-
+    let sent = 0
+    let failed = 0
 
     for (
         let index = 0;
         index < groups.length;
         index++
     ) {
-
-        if (
-            shouldCancel()
-        ) {
-
+        if (shouldCancel()) {
             return {
-
-                cancelled:
-                    true,
-
+                cancelled: true,
                 sent,
-
                 failed
-
             }
-
         }
-
 
         const group =
             groups[index]
 
-
         try {
-
             await sendMessage(
                 sock,
                 group.id,
@@ -130,59 +81,33 @@ async function sendToGroups(
             sent++
 
         } catch (error) {
-
             failed++
 
             console.error(
                 `[WHATSAPP] Erro ao enviar para ${group.name}:`,
                 error
             )
-
         }
-
 
         if (onProgress) {
-
             onProgress({
-
-                current:
-                    index + 1,
-
-                total:
-                    groups.length,
-
+                current: index + 1,
+                total: groups.length,
                 sent,
-
                 failed,
-
-                group:
-                    group.name
-
+                group: group.name
             })
-
         }
-
     }
-
 
     return {
-
-        cancelled:
-            false,
-
+        cancelled: false,
         sent,
-
         failed
-
     }
-
 }
-
 
 module.exports = {
-
     sendMessage,
     sendToGroups
-
 }
-
