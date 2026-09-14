@@ -1,3 +1,4 @@
+
 // caminho: public/app.js
 
 const socket =
@@ -85,6 +86,7 @@ socket.on(
 
 
         if (
+            !result ||
             !result.success
         ) {
 
@@ -187,21 +189,6 @@ socket.on(
             connected
         )
 
-
-        if (
-            connected
-        ) {
-
-            console.log(
-                '[APP] WhatsApp conectado. Abrindo painel.'
-            )
-
-
-            window.location.href =
-                '/painel/'
-
-        }
-
     }
 )
 
@@ -235,6 +222,11 @@ socket.on(
             state.connected
         ) {
 
+            console.log(
+                '[APP] WhatsApp conectado. Abrindo painel.'
+            )
+
+
             window.location.href =
                 '/painel/'
 
@@ -263,3 +255,4 @@ socket.on(
 
 
 showStartPage()
+
