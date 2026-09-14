@@ -1,3 +1,4 @@
+
 // caminho: src/whatsapp/state.js
 
 let sock = null
@@ -10,8 +11,6 @@ let currentStatus =
     'WhatsApp está parado.'
 
 let currentQR = false
-
-let groups = []
 
 
 function getSocket() {
@@ -89,21 +88,6 @@ function setQR(
 }
 
 
-function getGroups() {
-
-    return groups
-}
-
-
-function setGroups(
-    newGroups
-) {
-
-    groups =
-        newGroups
-}
-
-
 function reset() {
 
     sock =
@@ -120,9 +104,6 @@ function reset() {
 
     currentQR =
         false
-
-    groups =
-        []
 }
 
 
@@ -138,9 +119,7 @@ function getState() {
             currentStatus,
 
         qr:
-            currentQR,
-
-        groups
+            currentQR
     }
 }
 
@@ -162,10 +141,8 @@ module.exports = {
     hasQR,
     setQR,
 
-    getGroups,
-    setGroups,
-
     reset,
 
     getState
 }
+

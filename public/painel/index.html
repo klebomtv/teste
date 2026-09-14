@@ -2,6 +2,7 @@
 <!-- caminho: public/painel/index.html -->
 
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 
 <head>
@@ -13,7 +14,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>WhatsApp Bot</title>
+    <title>Painel</title>
 
     <link
         rel="stylesheet"
@@ -24,136 +25,48 @@
 
 <body>
 
-    <main
-        id="panel-page"
-        class="page"
-    >
+    <main id="app">
 
-        <section
-            class="card panel-card"
-        >
+        <header class="header">
 
             <h1>
-                WhatsApp Bot
+                Painel
             </h1>
 
-
-            <!-- STATUS -->
-
-            <p
-                id="panel-status"
-                class="panel-status"
+            <span
+                id="connection-status"
+                class="status"
             >
-                WhatsApp conectado.
-            </p>
+                Conectando...
+            </span>
+
+        </header>
 
 
-            <!-- MENSAGEM -->
+        <section class="content">
 
-            <div
-                class="message-section"
-            >
+            <div class="card">
 
-                <label
-                    for="message"
-                >
-                    Message
-                </label>
+                <h2>
+                    WhatsApp
+                </h2>
 
-                <textarea
-                    id="message"
-                    rows="5"
-                    placeholder="Enter your message..."
-                ></textarea>
+                <p id="whatsapp-status">
+                    Aguardando...
+                </p>
 
             </div>
 
 
-            <!-- GRUPOS -->
+            <div class="card">
 
-            <div
-                class="groups-section"
-            >
+                <h2>
+                    Sistema
+                </h2>
 
-                <div
-                    class="groups-header"
-                >
-
-                    <span>
-                        Groups
-                    </span>
-
-
-                    <label
-                        class="select-all"
-                    >
-
-                        <input
-                            type="checkbox"
-                            id="select-all"
-                        >
-
-                        Send to all
-
-                    </label>
-
-                </div>
-
-
-                <!--
-                    O JavaScript vai preencher
-                    este elemento com os grupos.
-                -->
-
-                <div
-                    id="groups"
-                    class="groups-list"
-                >
-
-                    <p
-                        class="groups-empty"
-                    >
-                        Loading groups...
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- ENVIAR -->
-
-            <button
-                id="send-message"
-                type="button"
-            >
-                Send Message
-            </button>
-
-
-            <!-- STATUS DO ENVIO -->
-
-            <div
-                id="send-status"
-                class="send-status"
-            ></div>
-
-
-            <!-- COOLDOWN -->
-
-            <div
-                id="cooldown"
-                class="cooldown"
-                style="display: none;"
-            >
-
-                Next send in:
-
-                <strong
-                    id="cooldown-time"
-                >
-                    30s
-                </strong>
+                <p id="system-status">
+                    Painel carregado.
+                </p>
 
             </div>
 
@@ -162,38 +75,7 @@
     </main>
 
 
-    <!--
-        Socket.IO
-    -->
-
-    <script
-        src="/socket.io/socket.io.js"
-    ></script>
-
-
-    <!--
-        Controle de cooldown
-    -->
-
-    <script
-        src="/painel/js/cooldown.js"
-    ></script>
-
-
-    <!--
-        Mensagens
-        Cria window.panelSocket
-    -->
-
-    <script
-        src="/painel/js/messages.js"
-    ></script>
-
-
-    <!--
-        Painel
-        Recebe e renderiza os grupos
-    -->
+    <script src="/socket.io/socket.io.js"></script>
 
     <script
         src="/painel/js/panel.js"

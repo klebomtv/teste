@@ -1,196 +1,86 @@
 
 // caminho: public/painel/js/panel.js
 
-const panelStatus =
+console.log(
+    '[PAINEL] Nova interface carregada.'
+)
+
+
+const socket =
+    io()
+
+
+const connectionStatus =
     document.getElementById(
-        'panel-status'
+        'connection-status'
     )
 
-const panelSocket =
-    window.panelSocket
 
-function updateStatus(
-    text
-) {
-
-    if (
-        panelStatus
-    ) {
-
-        panelStatus.textContent =
-            text
-    }
-}
-
-function requestGroups() {
-
-    if (
-        !panelSocket
-    ) {
-
-        console.error(
-            '[PAINEL] Socket não encontrado.'
-        )
-
-        return
-    }
-
-    console.log(
-        '[PAINEL] Solicitando grupos.'
+const whatsappStatus =
+    document.getElementById(
+        'whatsapp-status'
     )
 
-    panelSocket.emit(
-        'request-groups'
-    )
-}
 
-if (
-    !panelSocket
-) {
-
-    console.error(
-        '[PAINEL] window.panelSocket não existe.'
+const systemStatus =
+    document.getElementById(
+        'system-status'
     )
 
-} else {
 
-    console.log(
-        '[PAINEL] Socket encontrado.'
-    )
-
-    panelSocket.on(
-        'connect',
-        () => {
-
-            console.log(
-                '[PAINEL] Socket conectado.'
-            )
-
-            requestGroups()
-        }
-    )
-
-    panelSocket.on(
-        'whatsapp-state',
-        state => {
-
-            console.log(
-                '[PAINEL] Estado recebido:',
-                state
-            )
-
-            if (
-                !state
-            ) {
-                return
-            }
-
-            if (
-                state.status
-            ) {
-
-                updateStatus(
-                    state.status
-                )
-            }
-
-            if (
-                Array.isArray(
-                    state.groups
-                )
-            ) {
-
-                console.log(
-                    '[PAINEL] Grupos no estado:',
-                    state.groups.length
-                )
-
-                if (
-                    window.panelGroups
-                ) {
-
-                    window.panelGroups.set(
-                        state.groups
-                    )
-                }
-            }
-        }
-    )
-
-    panelSocket.on(
-        'groups',
-        groups => {
-
-            console.log(
-                '[PAINEL] Evento groups recebido.'
-            )
-
-            if (
-                !Array.isArray(
-                    groups
-                )
-            ) {
-
-                console.error(
-                    '[PAINEL] Grupos não são um array.'
-                )
-
-                return
-            }
-
-            console.log(
-                '[PAINEL] Total de grupos:',
-                groups.length
-            )
-
-            if (
-                window.panelGroups
-            ) {
-
-                window.panelGroups.set(
-                    groups
-                )
-            }
-        }
-    )
-
-    panelSocket.on(
-        'connected',
-        connected => {
-
-            console.log(
-                '[PAINEL] WhatsApp:',
-                connected
-                    ? 'conectado'
-                    : 'desconectado'
-            )
-
-            updateStatus(
-                connected
-                    ? 'WhatsApp conectado.'
-                    : 'WhatsApp desconectado.'
-            )
-        }
-    )
-
-    /*
-     * Caso o socket já esteja conectado
-     * antes deste arquivo ser executado.
-     */
-
-    if (
-        panelSocket.connected
-    ) {
+socket.on(
+    'connect',
+    () => {
 
         console.log(
-            '[PAINEL] Socket já conectado.'
+            '[PAINEL] Socket conectado.',
+            socket.id
         )
 
-        requestGroups()
-    }
-}
 
-console.log(
-    '[PAINEL] Painel carregado.'
+        connectionStatus.textContent =
+            'Socket conectado.'
+
+        systemStatus.textContent =
+            'Painel conectado ao servidor.'
+
+    }
 )
+
+
+socket.on(
+    'connect_error',
+    error => {
+
+        console.error(
+            '[PAINEL] Erro no Socket:',
+            error
+        )
+
+
+        connectionStatus.textContent =
+            'Erro na conexão.'
+
+    }
+)
+
+
+socket.on(
+    'disconnect',
+    () => {
+
+        console.log(
+            '[PAINEL] Socket desconectado.'
+        )
+
+
+        connectionStatus.textContent =
+            'Socket desconectado.'
+
+    }
+)
+
+
+whatsappStatus.textContent =
+    'Aguardando conexão do WhatsApp.'
 

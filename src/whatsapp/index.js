@@ -1,3 +1,4 @@
+
 // caminho: src/whatsapp/index.js
 
 const state =
@@ -16,15 +17,11 @@ const qr =
     require('./qr')
 
 
-const groups =
-    require('./groups')
-
-
 const QR_TIMEOUT =
     60 * 1000
 
 
-function createWhatsApp(io) {
+function createWhatsApp() {
 
     let qrTimeout =
         null
@@ -96,17 +93,6 @@ function createWhatsApp(io) {
                     state.reset()
 
 
-                    io.emit(
-                        'qr-expired'
-                    )
-
-
-                    io.emit(
-                        'whatsapp-state',
-                        state.getState()
-                    )
-
-
                     console.log(
                         '[WHATSAPP] Sessão QR encerrada após 60 segundos.'
                     )
@@ -152,19 +138,8 @@ function createWhatsApp(io) {
         )
 
 
-        state.setGroups(
-            []
-        )
-
-
         state.setStatus(
             'Iniciando WhatsApp...'
-        )
-
-
-        io.emit(
-            'whatsapp-state',
-            state.getState()
         )
 
 
@@ -239,17 +214,6 @@ function createWhatsApp(io) {
                             qrCode
                         )
 
-
-                        io.emit(
-                            'qr-updated'
-                        )
-
-
-                        io.emit(
-                            'whatsapp-state',
-                            state.getState()
-                        )
-
                     }
 
 
@@ -283,75 +247,7 @@ function createWhatsApp(io) {
 
 
                         state.setStatus(
-                            'Carregando grupos...'
-                        )
-
-
-                        io.emit(
-                            'whatsapp-state',
-                            state.getState()
-                        )
-
-
-                        /*
-                         * ==================================
-                         * CARREGAR GRUPOS
-                         * ==================================
-                         */
-
-                        console.log(
-                            '[WHATSAPP] Carregando grupos...'
-                        )
-
-
-                        const groupList =
-                            await groups.loadGroups(
-                                sock
-                            )
-
-
-                        state.setGroups(
-                            groupList
-                        )
-
-
-                        console.log(
-                            '[WHATSAPP] Grupos carregados:',
-                            groupList.length
-                        )
-
-
-                        /*
-                         * ==================================
-                         * WHATSAPP PRONTO
-                         * ==================================
-                         */
-
-                        state.setStatus(
                             'WhatsApp conectado.'
-                        )
-
-
-                        io.emit(
-                            'groups',
-                            groupList
-                        )
-
-
-                        io.emit(
-                            'whatsapp-state',
-                            state.getState()
-                        )
-
-
-                        /*
-                         * Só agora avisamos ao navegador
-                         * que pode abrir o painel.
-                         */
-
-                        io.emit(
-                            'connected',
-                            true
                         )
 
                     }
@@ -390,29 +286,6 @@ function createWhatsApp(io) {
                             'WhatsApp desconectado.'
                         )
 
-
-                        state.setGroups(
-                            []
-                        )
-
-
-                        io.emit(
-                            'connected',
-                            false
-                        )
-
-
-                        io.emit(
-                            'groups',
-                            []
-                        )
-
-
-                        io.emit(
-                            'whatsapp-state',
-                            state.getState()
-                        )
-
                     }
 
                 }
@@ -443,12 +316,6 @@ function createWhatsApp(io) {
 
 
             state.reset()
-
-
-            io.emit(
-                'whatsapp-state',
-                state.getState()
-            )
 
 
             return {
