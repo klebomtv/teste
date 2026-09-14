@@ -195,6 +195,42 @@ setupSocket(
 )
 
 
+/*
+ * ==========================================
+ * PÁGINA 404
+ * ==========================================
+ *
+ * Este middleware precisa ficar
+ * depois de todas as rotas.
+ */
+
+app.use(
+    (req, res) => {
+
+        res.status(
+            404
+        )
+
+
+        res.sendFile(
+            path.join(
+                __dirname,
+                'public',
+                '404',
+                'index.html'
+            )
+        )
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * SERVIDOR
+ * ==========================================
+ */
+
 server.listen(
     PORT,
     () => {

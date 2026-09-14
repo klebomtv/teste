@@ -1,3 +1,4 @@
+
 // caminho: auth/routes.js
 
 const path =
@@ -184,11 +185,14 @@ function setupAuthRoutes(
 
 
     /*
-     * O socket.js precisa acessar
-     * diretamente essas funções.
+     * Funções disponibilizadas
+     * para outros módulos.
      */
 
     return {
+
+        getSessionId:
+            auth.getSessionId,
 
         isSessionValid:
             auth.isSessionValid,
@@ -202,3 +206,4 @@ function setupAuthRoutes(
 
 module.exports =
     setupAuthRoutes
+
