@@ -2,7 +2,7 @@
 <!-- caminho: public/painel/index.html -->
 
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 
 <head>
 
@@ -13,7 +13,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Painel WhatsApp</title>
+    <title>Broadcast Panel</title>
 
     <link
         rel="stylesheet"
@@ -24,246 +24,308 @@
 
 <body>
 
-    <main class="painel">
+    <main class="app">
 
-        <header class="painel-header">
+        <!-- ================================= -->
+        <!-- HEADER                            -->
+        <!-- ================================= -->
 
-            <div>
+        <header class="header">
 
-                <h1>Grupos</h1>
+            <div class="brand">
 
-                <p>
-                    Grupos disponíveis no WhatsApp
-                </p>
+                <div class="brand-mark">
+                    W
+                </div>
+
+                <div>
+
+                    <h1>
+                        Broadcast
+                    </h1>
+
+                    <span>
+                        WhatsApp messaging panel
+                    </span>
+
+                </div>
 
             </div>
 
-            <div
-                id="group-count"
-                class="group-count"
-            >
-                0 grupos
+
+            <div class="connection">
+
+                <span
+                    id="connection-dot"
+                    class="connection-dot"
+                ></span>
+
+                <span id="connection-status">
+                    Connected
+                </span>
+
             </div>
 
         </header>
 
 
-        <section class="groups-section">
+        <!-- ================================= -->
+        <!-- MAIN CONTENT                      -->
+        <!-- ================================= -->
 
-            <div
-                id="groups"
-                class="groups-list"
-            >
-                <div class="loading">
-                    Carregando grupos...
+        <section class="workspace">
+
+
+            <!-- ================================= -->
+            <!-- GROUPS                            -->
+            <!-- ================================= -->
+
+            <section class="card groups-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h2>
+                            Groups
+                        </h2>
+
+                        <p>
+                            Select where you want to send your message.
+                        </p>
+
+                    </div>
+
+
+                    <span
+                        id="group-count"
+                        class="counter"
+                    >
+                        0
+                    </span>
+
                 </div>
-            </div>
+
+
+                <div class="group-actions">
+
+                    <label class="select-all">
+
+                        <input
+                            type="checkbox"
+                            id="select-all"
+                        >
+
+                        <span>
+                            Select all
+                        </span>
+
+                    </label>
+
+
+                    <span
+                        id="selected-count"
+                        class="selected-count"
+                    >
+                        0 selected
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="groups"
+                    class="groups-list"
+                >
+
+                    <div class="loading">
+                        Loading groups...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================= -->
+            <!-- MESSAGE                            -->
+            <!-- ================================= -->
+
+            <section class="card composer-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h2>
+                            Message
+                        </h2>
+
+                        <p>
+                            Compose the message you want to broadcast.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="composer">
+
+                    <label
+                        for="message"
+                        class="field-label"
+                    >
+                        Message
+                    </label>
+
+
+                    <textarea
+                        id="message"
+                        placeholder="Write your message here..."
+                        maxlength="4096"
+                    ></textarea>
+
+
+                    <div class="composer-footer">
+
+                        <span id="character-count">
+                            0 / 4096
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- COOLDOWN                          -->
+                <!-- ================================= -->
+
+                <div class="cooldown">
+
+                    <div>
+
+                        <span class="cooldown-title">
+                            Sending protection
+                        </span>
+
+                        <span class="cooldown-description">
+                            Messages are sent using the configured cooldown.
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="cooldown-status"
+                        class="cooldown-status"
+                    >
+                        Ready
+                    </div>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- SEND AREA                         -->
+                <!-- ================================= -->
+
+                <div class="send-area">
+
+                    <div class="send-info">
+
+                        <strong id="send-target-count">
+                            0 groups
+                        </strong>
+
+                        <span>
+                            selected for delivery
+                        </span>
+
+                    </div>
+
+
+                    <div class="send-buttons">
+
+                        <button
+                            id="cancel-send"
+                            class="button button-secondary"
+                            type="button"
+                            hidden
+                        >
+                            Cancel
+                        </button>
+
+
+                        <button
+                            id="send-message"
+                            class="button button-primary"
+                            type="button"
+                            disabled
+                        >
+                            Send message
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ================================= -->
+                <!-- PROGRESS                          -->
+                <!-- ================================= -->
+
+                <div
+                    id="progress-area"
+                    class="progress-area"
+                    hidden
+                >
+
+                    <div class="progress-header">
+
+                        <span>
+                            Sending...
+                        </span>
+
+                        <span id="progress-text">
+                            0 / 0
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-bar">
+
+                        <div
+                            id="progress-fill"
+                            class="progress-fill"
+                        ></div>
+
+                    </div>
+
+
+                    <div
+                        id="send-status"
+                        class="send-status"
+                    >
+                        Preparing delivery...
+                    </div>
+
+                </div>
+
+            </section>
 
         </section>
 
-    </main>
 
+        <!-- ================================= -->
+        <!-- FOOTER                            -->
+        <!-- ================================= -->
 
-    <script src="/socket.io/socket.io.js"></script>
+        <footer class="footer">
 
-
-    <script>
-
-        const socket =
-            io()
-
-
-        const groupsContainer =
-            document.getElementById(
-                'groups'
-            )
-
-
-        const groupCount =
-            document.getElementById(
-                'group-count'
-            )
-
-
-        function showGroups(groups) {
-
-            console.log(
-                '[PAINEL] Grupos recebidos:',
-                groups
-            )
-
-
-            if (
-                !Array.isArray(groups) ||
-                groups.length === 0
-            ) {
-
-                groupsContainer.innerHTML =
-                    `
-                    <div class="empty">
-                        Nenhum grupo encontrado.
-                    </div>
-                    `
-
-                groupCount.textContent =
-                    '0 grupos'
-
-                return
-
-            }
-
-
-            groupsContainer.innerHTML =
-                ''
-
-
-            groupCount.textContent =
-                `${groups.length} grupos`
-
-
-            groups.forEach(
-                (group, index) => {
-
-                    const item =
-                        document.createElement(
-                            'div'
-                        )
-
-
-                    item.className =
-                        'group-item'
-
-
-                    item.dataset.id =
-                        group.id
-
-
-                    item.innerHTML =
-                        `
-                        <span class="group-number">
-                            ${index + 1}
-                        </span>
-
-                        <span class="group-name">
-                            ${escapeHTML(
-                                group.name
-                            )}
-                        </span>
-                        `
-
-
-                    groupsContainer.appendChild(
-                        item
-                    )
-
-                }
-            )
-
-        }
-
-
-        function escapeHTML(text) {
-
-            const element =
-                document.createElement(
-                    'div'
-                )
-
-            element.textContent =
-                text || 'Grupo sem nome'
-
-            return element.innerHTML
-
-        }
-
-
-        socket.on(
-            'connect',
-            () => {
-
-                console.log(
-                    '[PAINEL] Socket conectado:',
-                    socket.id
-                )
-
-            }
-        )
-
-
-        socket.on(
-            'disconnect',
-            () => {
-
-                console.log(
-                    '[PAINEL] Socket desconectado.'
-                )
-
-            }
-        )
-
-
-        socket.on(
-            'groups',
-            groups => {
-
-                showGroups(
-                    groups
-                )
-
-            }
-        )
-
-
-        socket.on(
-            'whatsapp-state',
-            state => {
-
-                console.log(
-                    '[PAINEL] Estado recebido:',
-                    state
-                )
-
-
-                if (
-                    state &&
-                    Array.isArray(
-                        state.groups
-                    )
-                ) {
-
-                    showGroups(
-                        state.groups
-                    )
-
-                }
-
-            }
-        )
-
-
-        socket.on(
-            'auth-error',
-            data => {
-
-                console.error(
-                    '[PAINEL] Erro de autenticação:',
-                    data
-                )
-
-
-                groupsContainer.innerHTML =
-                    `
-                    <div class="error">
-                        Sessão não autenticada.
-                    </div>
-                    `
-
-            }
-        )
-
-    </script>
-
-</body>
-
-</html>
+            <span>
+                WhatsApp Broadcast
+            </span>
 ```
