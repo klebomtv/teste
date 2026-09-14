@@ -1,4 +1,3 @@
-
 // caminho: src/socket.js
 
 function setupSocket(
@@ -128,7 +127,6 @@ function setupSocket(
                 socket.disconnect()
 
                 return
-
             }
 
 
@@ -171,14 +169,13 @@ function setupSocket(
                         )
 
 
-                        await whatsapp.start()
+                        const result =
+                            await whatsapp.start()
 
 
                         socket.emit(
                             'start-result',
-                            {
-                                success: true
-                            }
+                            result
                         )
 
 
@@ -195,10 +192,182 @@ function setupSocket(
                         socket.emit(
                             'start-result',
                             {
-                                success: false,
+                                success:
+                                    false,
+
                                 message:
                                     error.message ||
                                     'Não foi possível iniciar o WhatsApp.'
+                            }
+                        )
+
+                    }
+
+                }
+            )
+
+
+            /*
+             * ==========================================
+             * ENVIAR MENSAGEM
+             * ==========================================
+             */
+
+            socket.on(
+                'send-message',
+                async data => {
+
+                    console.log(
+                        '[SOCKET SERVER] send-message recebido.'
+                    )
+
+
+                    console.log(
+                        '[SOCKET SERVER] Dados recebidos:',
+                        data
+                    )
+
+
+                    try {
+
+                        const groupIds =
+                            Array.isArray(
+                                data?.groupIds
+                            )
+                                ? data.groupIds
+                                : []
+
+
+                        const message =
+                            typeof data?.message === 'string'
+                                ? data.message
+                                : ''
+
+
+                        if (
+                            !groupIds.length
+                        ) {
+
+                            throw new Error(
+                                'Nenhum grupo selecionado.'
+                            )
+                        }
+
+
+                        if (
+                            !message.trim()
+                        ) {
+
+                            throw new Error(
+                                'Mensagem não informada.'
+                            )
+                        }
+
+
+                        console.log(
+                            '[SOCKET SERVER] Grupos:',
+                            groupIds
+                        )
+
+
+                        console.log(
+                            '[SOCKET SERVER] Mensagem:',
+                            message
+                        )
+
+
+                        const result =
+                            await whatsapp.sendToSelected(
+                                groupIds,
+                                message
+                            )
+
+
+                        console.log(
+                            '[SOCKET SERVER] Resultado do envio:',
+                            result
+                        )
+
+
+                    } catch (
+                        error
+                    ) {
+
+                        console.error(
+                            '[SOCKET SERVER] Erro ao enviar mensagem:',
+                            error
+                        )
+
+
+                        socket.emit(
+                            'send-result',
+                            {
+                                success:
+                                    false,
+
+                                message:
+                                    error.message ||
+                                    'Erro ao enviar mensagem.'
+                            }
+                        )
+
+                    }
+
+                }
+            )
+
+
+            /*
+             * ==========================================
+             * CANCELAR ENVIO
+             * ==========================================
+             */
+
+            socket.on(
+                'cancel-send',
+                () => {
+
+                    console.log(
+                        '[SOCKET SERVER] cancel-send recebido.'
+                    )
+
+
+                    try {
+
+                        const result =
+                            whatsapp.cancelSending()
+
+
+                        console.log(
+                            '[SOCKET SERVER] Resultado do cancelamento:',
+                            result
+                        )
+
+
+                        socket.emit(
+                            'cancel-result',
+                            result
+                        )
+
+                    } catch (
+                        error
+                    ) {
+
+                        console.error(
+                            '[SOCKET SERVER] Erro ao cancelar envio:',
+                            error
+                        )
+
+
+                        socket.emit(
+                            'cancel-result',
+                            {
+                                success:
+                                    false,
+
+                                message:
+                                    error.message ||
+                                    'Erro ao cancelar envio.'
                             }
                         )
 
@@ -222,39 +391,47 @@ function setupSocket(
                         '======================================'
                     )
 
+
                     console.log(
                         '[SOCKET SERVER] CLIENTE DESCONECTADO'
                     )
+
 
                     console.log(
                         '[SOCKET SERVER] Socket ID:',
                         socket.id
                     )
 
+
                     console.log(
                         '[SOCKET SERVER] Motivo:',
                         reason
                     )
+
 
                     console.log(
                         '[SOCKET SERVER] Connected:',
                         socket.connected
                     )
 
+
                     console.log(
                         '[SOCKET SERVER] Transport:',
                         socket.conn?.transport?.name
                     )
+
 
                     console.log(
                         '[SOCKET SERVER] Handshake URL:',
                         socket.handshake?.url
                     )
 
+
                     console.log(
                         '[SOCKET SERVER] User-Agent:',
                         socket.handshake?.headers?.['user-agent']
                     )
+
 
                     console.log(
                         '======================================'

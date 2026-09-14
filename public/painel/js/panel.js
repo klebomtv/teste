@@ -10,15 +10,27 @@ const socket =
     io()
 
 
+const connectionStatus =
+    document.getElementById(
+        'connection-status'
+    )
+
+
+const connectionDot =
+    document.getElementById(
+        'connection-dot'
+    )
+
+
 const groupsContainer =
     document.getElementById(
         'groups'
     )
 
 
-const selectAll =
+const groupCount =
     document.getElementById(
-        'select-all'
+        'group-count'
     )
 
 
@@ -28,9 +40,27 @@ const selectedCount =
     )
 
 
-const messageInput =
+const selectAll =
+    document.getElementById(
+        'select-all'
+    )
+
+
+const message =
     document.getElementById(
         'message'
+    )
+
+
+const characterCount =
+    document.getElementById(
+        'character-count'
+    )
+
+
+const sendTargetCount =
+    document.getElementById(
+        'send-target-count'
     )
 
 
@@ -46,19 +76,37 @@ const cancelButton =
     )
 
 
-const progress =
+const progressArea =
     document.getElementById(
-        'progress'
+        'progress-area'
     )
 
 
-const status =
+const progressText =
     document.getElementById(
-        'status'
+        'progress-text'
     )
 
 
-let groups =
+const progressFill =
+    document.getElementById(
+        'progress-fill'
+    )
+
+
+const sendStatus =
+    document.getElementById(
+        'send-status'
+    )
+
+
+const cooldownStatus =
+    document.getElementById(
+        'cooldown-status'
+    )
+
+
+let availableGroups =
     []
 
 
@@ -66,20 +114,166 @@ let sending =
     false
 
 
-function renderGroups(
-    list
+/*
+ * ==========================================
+ * CONEXÃO
+ * ==========================================
+ */
+
+function setConnectionStatus(
+    connected
 ) {
 
     if (
-        !groupsContainer
+        connected
     ) {
 
-        console.warn(
-            '[PAINEL] Container de grupos não encontrado.'
+        connectionStatus.textContent =
+            'Connected'
+
+
+        connectionDot.classList.add(
+            'connected'
         )
 
-        return
+    } else {
+
+        connectionStatus.textContent =
+            'Disconnected'
+
+
+        connectionDot.classList.remove(
+            'connected'
+        )
+
     }
+
+
+    updateSendButton()
+}
+
+
+/*
+ * ==========================================
+ * SOCKET CONECTADO
+ * ==========================================
+ */
+
+socket.on(
+    'connect',
+    () => {
+
+        console.log(
+            '[PAINEL] Socket conectado:',
+            socket.id
+        )
+
+
+        console.log(
+            '[PAINEL] Transport:',
+            socket.io.engine.transport.name
+        )
+
+
+        setConnectionStatus(
+            true
+        )
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * SOCKET DESCONECTADO
+ * ==========================================
+ */
+
+socket.on(
+    'disconnect',
+    reason => {
+
+        console.error(
+            '[PAINEL] Socket desconectado:',
+            reason
+        )
+
+
+        setConnectionStatus(
+            false
+        )
+
+
+        sending =
+            false
+
+
+        updateSendButton()
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * ERRO DE CONEXÃO
+ * ==========================================
+ */
+
+socket.on(
+    'connect_error',
+    error => {
+
+        console.error(
+            '[PAINEL] Erro Socket.IO:',
+            error
+        )
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * AUTENTICAÇÃO
+ * ==========================================
+ */
+
+socket.on(
+    'auth-error',
+    data => {
+
+        console.error(
+            '[PAINEL] Erro de autenticação:',
+            data
+        )
+
+
+        connectionStatus.textContent =
+            'Authentication error'
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * RENDERIZAR GRUPOS
+ * ==========================================
+ */
+
+function renderGroups(
+    groups
+) {
+
+    availableGroups =
+        Array.isArray(groups)
+            ? groups
+            : []
+
+
+    groupCount.textContent =
+        availableGroups.length
 
 
     groupsContainer.innerHTML =
@@ -87,21 +281,24 @@ function renderGroups(
 
 
     if (
-        !Array.isArray(list) ||
-        !list.length
+        availableGroups.length === 0
     ) {
 
         groupsContainer.innerHTML =
-            '<p>Nenhum grupo encontrado.</p>'
+            '<div class="loading">No groups found.</div>'
 
-        updateSelectedCount()
+
+        updateSelection()
 
         return
     }
 
 
-    list.forEach(
-        group => {
+    availableGroups.forEach(
+        (
+            group,
+            index
+        ) => {
 
             const label =
                 document.createElement(
@@ -131,22 +328,8 @@ function renderGroups(
                 group.id
 
 
-            checkbox.dataset.groupId =
-                group.id
-
-
-            checkbox.dataset.groupName =
-                group.name
-
-
-            checkbox.addEventListener(
-                'change',
-                () => {
-
-                    updateSelectedCount()
-
-                }
-            )
+            checkbox.dataset.index =
+                index
 
 
             const name =
@@ -156,7 +339,8 @@ function renderGroups(
 
 
             name.textContent =
-                group.name
+                group.name ||
+                'Unnamed group'
 
 
             label.appendChild(
@@ -172,182 +356,273 @@ function renderGroups(
             groupsContainer.appendChild(
                 label
             )
+
+
+            checkbox.addEventListener(
+                'change',
+                updateSelection
+            )
+
         }
     )
 
 
-    updateSelectedCount()
+    updateSelection()
 }
 
 
-function getSelectedIds() {
+/*
+ * ==========================================
+ * EVENTO GROUPS
+ * ==========================================
+ */
 
-    if (
-        !groupsContainer
-    ) {
+socket.on(
+    'groups',
+    groups => {
 
-        return []
-    }
-
-
-    const checkboxes =
-        groupsContainer.querySelectorAll(
-            '.group-checkbox:checked'
+        console.log(
+            '[PAINEL] Grupos recebidos:',
+            groups
         )
 
 
-    return Array.from(
-        checkboxes
-    ).map(
+        renderGroups(
+            groups
+        )
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * ESTADO WHATSAPP
+ * ==========================================
+ */
+
+socket.on(
+    'whatsapp-state',
+    state => {
+
+        console.log(
+            '[PAINEL] Estado recebido:',
+            state
+        )
+
+
+        if (
+            state &&
+            Array.isArray(
+                state.groups
+            )
+        ) {
+
+            renderGroups(
+                state.groups
+            )
+
+        }
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * GRUPOS SELECIONADOS
+ * ==========================================
+ */
+
+function getSelectedGroups() {
+
+    return [
+        ...document.querySelectorAll(
+            '.group-checkbox:checked'
+        )
+    ]
+    .map(
         checkbox =>
             checkbox.value
     )
 }
 
 
-function updateSelectedCount() {
+/*
+ * ==========================================
+ * ATUALIZAR SELEÇÃO
+ * ==========================================
+ */
 
-    const selectedIds =
-        getSelectedIds()
+function updateSelection() {
 
-
-    if (
-        selectedCount
-    ) {
-
-        selectedCount.textContent =
-            selectedIds.length
-    }
+    const selected =
+        getSelectedGroups()
 
 
-    if (
-        selectAll &&
-        groupsContainer
-    ) {
+    const total =
+        availableGroups.length
+
+
+    selectedCount.textContent =
+        `${selected.length} selected`
+
+
+    sendTargetCount.textContent =
+        `${selected.length} ${
+            selected.length === 1
+                ? 'group'
+                : 'groups'
+        }`
+
+
+    selectAll.checked =
+        total > 0 &&
+        selected.length === total
+
+
+    selectAll.indeterminate =
+        selected.length > 0 &&
+        selected.length < total
+
+
+    updateSendButton()
+}
+
+
+/*
+ * ==========================================
+ * SELECIONAR TODOS
+ * ==========================================
+ */
+
+selectAll.addEventListener(
+    'change',
+    () => {
 
         const checkboxes =
-            groupsContainer.querySelectorAll(
+            document.querySelectorAll(
                 '.group-checkbox'
             )
 
 
-        selectAll.checked =
-            checkboxes.length > 0 &&
-            selectedIds.length ===
-                checkboxes.length
+        checkboxes.forEach(
+            checkbox => {
+
+                checkbox.checked =
+                    selectAll.checked
+
+            }
+        )
+
+
+        updateSelection()
+
     }
-}
+)
 
 
-function setSendingState(
-    value
-) {
+/*
+ * ==========================================
+ * CONTADOR DE CARACTERES
+ * ==========================================
+ */
 
-    sending =
-        Boolean(value)
+message.addEventListener(
+    'input',
+    () => {
 
+        characterCount.textContent =
+            `${message.value.length} / 4096`
+
+
+        updateSendButton()
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * ATUALIZAR BOTÃO
+ * ==========================================
+ */
+
+function updateSendButton() {
 
     if (
-        sendButton
-    ) {
-
-        sendButton.disabled =
-            sending
-    }
-
-
-    if (
-        cancelButton
-    ) {
-
-        cancelButton.disabled =
-            !sending
-    }
-}
-
-
-function showProgress(
-    data
-) {
-
-    if (
-        !progress
+        !sendButton
     ) {
 
         return
     }
 
 
-    const current =
-        Number(
-            data?.current || 0
-        )
+    const hasGroups =
+        getSelectedGroups().length > 0
 
 
-    const total =
-        Number(
-            data?.total || 0
-        )
+    const hasMessage =
+        message.value.trim().length > 0
 
 
-    const sent =
-        Number(
-            data?.sent || 0
-        )
+    sendButton.disabled =
+        !hasGroups ||
+        !hasMessage ||
+        !socket.connected ||
+        sending ||
+        isCooldown()
 
-
-    const failed =
-        Number(
-            data?.failed || 0
-        )
-
-
-    const group =
-        data?.group ||
-        ''
-
-
-    progress.textContent =
-        `Enviando ${current}/${total} — ` +
-        `Enviadas: ${sent} — ` +
-        `Falhas: ${failed}` +
-        (
-            group
-                ? ` — ${group}`
-                : ''
-        )
 }
 
 
-function getMessage() {
+/*
+ * ==========================================
+ * INICIAR ENVIO
+ * ==========================================
+ */
 
-    if (
-        !messageInput
-    ) {
+function sendMessage() {
 
-        return ''
-    }
-
-
-    return messageInput.value.trim()
-}
+    console.log(
+        '[PAINEL] Botão Send message clicado.'
+    )
 
 
-function validateSend() {
+    console.log(
+        '[PAINEL] Socket conectado:',
+        socket.connected
+    )
+
+
+    const selectedGroups =
+        getSelectedGroups()
+
+
+    const text =
+        message.value.trim()
+
+
+    console.log(
+        '[PAINEL] Grupos selecionados:',
+        selectedGroups
+    )
+
+
+    console.log(
+        '[PAINEL] Mensagem:',
+        text
+    )
+
 
     if (
         !socket.connected
     ) {
 
-        return 'Conexão com o servidor não está disponível.'
-    }
+        sendStatus.textContent =
+            'Servidor não conectado.'
 
-
-    if (
-        sending
-    ) {
-
-        return 'Já existe um envio em andamento.'
+        return
     }
 
 
@@ -355,275 +630,131 @@ function validateSend() {
         isCooldown()
     ) {
 
-        return 'Aguarde o tempo de cooldown terminar.'
-    }
-
-
-    const selectedIds =
-        getSelectedIds()
-
-
-    if (
-        !selectedIds.length
-    ) {
-
-        return 'Selecione pelo menos um grupo.'
-    }
-
-
-    const message =
-        getMessage()
-
-
-    if (
-        !message
-    ) {
-
-        return 'Digite uma mensagem.'
-    }
-
-
-    return null
-}
-
-
-function sendMessage() {
-
-    const error =
-        validateSend()
-
-
-    if (
-        error
-    ) {
-
-        if (
-            status
-        ) {
-
-            status.textContent =
-                error
-        }
+        sendStatus.textContent =
+            'Aguarde o cooldown.'
 
         return
     }
 
 
-    const selectedIds =
-        getSelectedIds()
+    if (
+        !selectedGroups.length
+    ) {
+
+        sendStatus.textContent =
+            'Selecione pelo menos um grupo.'
+
+        return
+    }
 
 
-    const message =
-        getMessage()
+    if (
+        !text
+    ) {
+
+        sendStatus.textContent =
+            'Digite uma mensagem.'
+
+        return
+    }
 
 
-    console.log(
-        '[PAINEL] Enviando mensagem.'
-    )
-
-
-    console.log(
-        '[PAINEL] Grupos selecionados:',
-        selectedIds
-    )
-
-
-    setSendingState(
+    sending =
         true
-    )
 
 
-    if (
-        status
-    ) {
-
-        status.textContent =
-            'Iniciando envio...'
-    }
+    sendButton.disabled =
+        true
 
 
-    if (
-        progress
-    ) {
+    cancelButton.hidden =
+        false
 
-        progress.textContent =
-            'Preparando envio...'
-    }
+
+    cancelButton.disabled =
+        false
+
+
+    progressArea.hidden =
+        false
+
+
+    progressText.textContent =
+        `0 / ${selectedGroups.length}`
+
+
+    progressFill.style.width =
+        '0%'
+
+
+    sendStatus.textContent =
+        'Preparing delivery...'
+
+
+    cooldownStatus.textContent =
+        'Sending'
 
 
     socket.emit(
         'send-message',
         {
             groupIds:
-                selectedIds,
+                selectedGroups,
 
             message:
-                message
+                text
         }
     )
-}
 
-
-function cancelSend() {
-
-    if (
-        !sending
-    ) {
-
-        return
-    }
-
-
-    console.log(
-        '[PAINEL] Solicitando cancelamento.'
-    )
-
-
-    if (
-        status
-    ) {
-
-        status.textContent =
-            'Solicitando cancelamento...'
-    }
-
-
-    socket.emit(
-        'cancel-send'
-    )
-}
-
-
-if (
-    selectAll
-) {
-
-    selectAll.addEventListener(
-        'change',
-        () => {
-
-            if (
-                !groupsContainer
-            ) {
-
-                return
-            }
-
-
-            const checkboxes =
-                groupsContainer.querySelectorAll(
-                    '.group-checkbox'
-                )
-
-
-            checkboxes.forEach(
-                checkbox => {
-
-                    checkbox.checked =
-                        selectAll.checked
-                }
-            )
-
-
-            updateSelectedCount()
-        }
-    )
-}
-
-
-if (
-    sendButton
-) {
-
-    sendButton.addEventListener(
-        'click',
-        sendMessage
-    )
-}
-
-
-if (
-    cancelButton
-) {
-
-    cancelButton.addEventListener(
-        'click',
-        cancelSend
-    )
 }
 
 
 /*
  * ==========================================
- * GRUPOS
+ * BOTÃO ENVIAR
  * ==========================================
  */
 
-socket.on(
-    'groups',
-    list => {
-
-        console.log(
-            '[PAINEL] Grupos recebidos:',
-            list
-        )
-
-
-        groups =
-            Array.isArray(list)
-                ? list
-                : []
-
-
-        renderGroups(
-            groups
-        )
-    }
+sendButton.addEventListener(
+    'click',
+    sendMessage
 )
 
 
-socket.on(
-    'whatsapp-state',
-    stateData => {
+/*
+ * ==========================================
+ * CANCELAR
+ * ==========================================
+ */
+
+cancelButton.addEventListener(
+    'click',
+    () => {
 
         console.log(
-            '[PAINEL] Estado recebido:',
-            stateData
+            '[PAINEL] Cancelamento solicitado.'
         )
 
 
-        if (
-            stateData &&
-            Array.isArray(
-                stateData.groups
-            )
-        ) {
-
-            groups =
-                stateData.groups
+        socket.emit(
+            'cancel-send'
+        )
 
 
-            renderGroups(
-                groups
-            )
-        }
+        sendStatus.textContent =
+            'Cancelamento solicitado...'
 
 
-        if (
-            stateData?.sending !== undefined
-        ) {
+        cancelButton.disabled =
+            true
 
-            setSendingState(
-                stateData.sending
-            )
-        }
     }
 )
 
 
 /*
  * ==========================================
- * INÍCIO DO ENVIO
+ * ENVIO INICIADO
  * ==========================================
  */
 
@@ -637,27 +768,37 @@ socket.on(
         )
 
 
-        setSendingState(
+        sending =
             true
-        )
 
 
-        if (
-            status
-        ) {
-
-            status.textContent =
-                'Enviando mensagens...'
-        }
+        sendButton.disabled =
+            true
 
 
-        if (
-            progress
-        ) {
+        cancelButton.hidden =
+            false
 
-            progress.textContent =
-                `0/${data?.total || 0}`
-        }
+
+        cancelButton.disabled =
+            false
+
+
+        progressArea.hidden =
+            false
+
+
+        progressText.textContent =
+            `0 / ${data?.total || 0}`
+
+
+        progressFill.style.width =
+            '0%'
+
+
+        sendStatus.textContent =
+            `Enviando para ${data?.total || 0} grupos...`
+
     }
 )
 
@@ -678,18 +819,38 @@ socket.on(
         )
 
 
-        showProgress(
-            data
-        )
+        const current =
+            Number(
+                data?.current || 0
+            )
 
 
-        if (
-            status
-        ) {
+        const total =
+            Number(
+                data?.total || 0
+            )
 
-            status.textContent =
-                `Enviando: ${data?.group || ''}`
-        }
+
+        const percent =
+            total > 0
+                ? (
+                    current /
+                    total
+                ) * 100
+                : 0
+
+
+        progressText.textContent =
+            `${current} / ${total}`
+
+
+        progressFill.style.width =
+            `${percent}%`
+
+
+        sendStatus.textContent =
+            `Enviando: ${data?.group || ''}`
+
     }
 )
 
@@ -710,44 +871,60 @@ socket.on(
         )
 
 
-        setSendingState(
+        sending =
             false
+
+
+        cancelButton.hidden =
+            true
+
+
+        cancelButton.disabled =
+            true
+
+
+        progressFill.style.width =
+            '100%'
+
+
+        progressText.textContent =
+            `${data?.sent || 0} / ${
+                data?.total ||
+                data?.sent ||
+                0
+            }`
+
+
+        sendStatus.textContent =
+            `Envio concluído. Enviadas: ${
+                data?.sent || 0
+            }. Falhas: ${
+                data?.failed || 0
+            }.`
+
+
+        startCooldown(
+            5,
+            sendButton
         )
 
 
-        if (
-            status
-        ) {
-
-            status.textContent =
-                'Envio finalizado.'
-        }
+        cooldownStatus.textContent =
+            'Cooldown'
 
 
-        if (
-            progress
-        ) {
+        setTimeout(
+            () => {
 
-            progress.textContent =
-                `Enviadas: ${data?.sent || 0} — ` +
-                `Falhas: ${data?.failed || 0}`
-        }
+                cooldownStatus.textContent =
+                    'Ready'
 
+                updateSendButton()
 
-        /*
-         * O cooldown continua sendo controlado
-         * pelo frontend.
-         */
+            },
+            5000
+        )
 
-        if (
-            sendButton
-        ) {
-
-            startCooldown(
-                10,
-                sendButton
-            )
-        }
     }
 )
 
@@ -768,41 +945,51 @@ socket.on(
         )
 
 
-        setSendingState(
+        sending =
             false
-        )
 
 
-        if (
-            status
-        ) {
-
-            status.textContent =
-                'Envio cancelado.'
-        }
+        cancelButton.hidden =
+            true
 
 
-        if (
-            progress
-        ) {
+        cancelButton.disabled =
+            true
 
-            progress.textContent =
-                `Enviadas: ${data?.sent || 0} — ` +
-                `Falhas: ${data?.failed || 0}`
-        }
+
+        sendStatus.textContent =
+            `Envio cancelado. Enviadas: ${
+                data?.sent || 0
+            }. Falhas: ${
+                data?.failed || 0
+            }.`
+
+
+        cooldownStatus.textContent =
+            'Ready'
+
+
+        updateSendButton()
+
     }
 )
 
 
 /*
  * ==========================================
- * RESULTADO DE ERRO
+ * ERRO DE ENVIO
  * ==========================================
  */
 
 socket.on(
     'send-result',
     data => {
+
+        console.log(
+            '[PAINEL] Resultado do envio:',
+            data
+        )
+
 
         if (
             data?.success
@@ -812,19 +999,29 @@ socket.on(
         }
 
 
-        setSendingState(
+        sending =
             false
-        )
 
 
-        if (
-            status
-        ) {
+        cancelButton.hidden =
+            true
 
-            status.textContent =
-                data?.message ||
-                'Erro ao enviar mensagem.'
-        }
+
+        cancelButton.disabled =
+            true
+
+
+        sendStatus.textContent =
+            data?.message ||
+            'Não foi possível enviar a mensagem.'
+
+
+        cooldownStatus.textContent =
+            'Ready'
+
+
+        updateSendButton()
+
     }
 )
 
@@ -849,89 +1046,29 @@ socket.on(
             data?.success
         ) {
 
-            if (
-                status
-            ) {
-
-                status.textContent =
-                    'Cancelamento solicitado.'
-            }
+            sendStatus.textContent =
+                'Cancelamento solicitado.'
 
         } else {
 
-            if (
-                status
-            ) {
+            sendStatus.textContent =
+                data?.message ||
+                'Nenhum envio em andamento.'
 
-                status.textContent =
-                    data?.message ||
-                    'Nenhum envio em andamento.'
-            }
         }
+
     }
 )
 
 
 /*
  * ==========================================
- * SOCKET.IO
+ * ESTADO INICIAL
  * ==========================================
  */
 
-socket.on(
-    'connect',
-    () => {
-
-        console.log(
-            '[PAINEL] Socket.IO conectado:',
-            socket.id
-        )
-    }
-)
+cooldownStatus.textContent =
+    'Ready'
 
 
-socket.on(
-    'disconnect',
-    reason => {
-
-        console.log(
-            '[PAINEL] Socket.IO desconectado:',
-            reason
-        )
-
-
-        setSendingState(
-            false
-        )
-
-
-        if (
-            status
-        ) {
-
-            status.textContent =
-                'Conexão com o servidor perdida.'
-        }
-    }
-)
-
-
-socket.on(
-    'connect_error',
-    error => {
-
-        console.error(
-            '[PAINEL] Erro Socket.IO:',
-            error
-        )
-
-
-        if (
-            status
-        ) {
-
-            status.textContent =
-                'Erro na conexão com o servidor.'
-        }
-    }
-)
+updateSelection()
