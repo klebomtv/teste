@@ -14,7 +14,13 @@ function setupAuthRoutes(
 ) {
 
     /*
-     * Página de login.
+     * Página inicial.
+     *
+     * Se existir uma sessão válida,
+     * envia para o sistema principal.
+     *
+     * Caso contrário,
+     * mostra o login.
      */
 
     app.get(
@@ -54,6 +60,28 @@ function setupAuthRoutes(
 
 
     /*
+     * Página de login.
+     *
+     * Esta rota sempre abre
+     * a tela de login.
+     */
+
+    app.get(
+        '/login/',
+        (req, res) => {
+
+            res.sendFile(
+                path.join(
+                    __dirname,
+                    '../public/login/index.html'
+                )
+            )
+
+        }
+    )
+
+
+    /*
      * Login.
      */
 
@@ -74,7 +102,9 @@ function setupAuthRoutes(
                 )
 
 
-            if (!result.success) {
+            if (
+                !result.success
+            ) {
 
                 return res.status(
                     401
@@ -109,10 +139,6 @@ function setupAuthRoutes(
 
     /*
      * Logout pelo navegador.
-     *
-     * Este endpoint continua existindo
-     * como alternativa ao logout pelo
-     * Socket.IO.
      */
 
     app.post(
@@ -125,7 +151,9 @@ function setupAuthRoutes(
                 )
 
 
-            if (sessionId) {
+            if (
+                sessionId
+            ) {
 
                 auth.destroySession(
                     sessionId
