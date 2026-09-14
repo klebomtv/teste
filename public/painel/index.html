@@ -2,7 +2,7 @@
 <!-- caminho: public/painel/index.html -->
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
 
@@ -37,12 +37,18 @@
                 WhatsApp Bot
             </h1>
 
+
+            <!-- STATUS -->
+
             <p
                 id="panel-status"
                 class="panel-status"
             >
-                WhatsApp connected.
+                WhatsApp conectado.
             </p>
+
+
+            <!-- MENSAGEM -->
 
             <div
                 class="message-section"
@@ -62,6 +68,9 @@
 
             </div>
 
+
+            <!-- GRUPOS -->
+
             <div
                 class="groups-section"
             >
@@ -73,6 +82,7 @@
                     <span>
                         Groups
                     </span>
+
 
                     <label
                         class="select-all"
@@ -89,6 +99,12 @@
 
                 </div>
 
+
+                <!--
+                    O JavaScript vai preencher
+                    este elemento com os grupos.
+                -->
+
                 <div
                     id="groups"
                     class="groups-list"
@@ -104,6 +120,9 @@
 
             </div>
 
+
+            <!-- ENVIAR -->
+
             <button
                 id="send-message"
                 type="button"
@@ -111,10 +130,16 @@
                 Send Message
             </button>
 
+
+            <!-- STATUS DO ENVIO -->
+
             <div
                 id="send-status"
                 class="send-status"
             ></div>
+
+
+            <!-- COOLDOWN -->
 
             <div
                 id="cooldown"
@@ -136,21 +161,39 @@
 
     </main>
 
+
+    <!--
+        Socket.IO
+    -->
+
     <script
         src="/socket.io/socket.io.js"
     ></script>
+
+
+    <!--
+        Controle de cooldown
+    -->
 
     <script
         src="/painel/js/cooldown.js"
     ></script>
 
-    <script
-        src="/painel/js/groups.js"
-    ></script>
+
+    <!--
+        Mensagens
+        Cria window.panelSocket
+    -->
 
     <script
         src="/painel/js/messages.js"
     ></script>
+
+
+    <!--
+        Painel
+        Recebe e renderiza os grupos
+    -->
 
     <script
         src="/painel/js/panel.js"

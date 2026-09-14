@@ -111,13 +111,50 @@ function setupSocket(
 
 
             /*
-             * Envia o estado atual
-             * do WhatsApp para o navegador.
+             * ======================================
+             * ESTADO ATUAL DO WHATSAPP
+             * ======================================
              */
+
+            const state =
+                whatsapp.getState()
+
 
             socket.emit(
                 'whatsapp-state',
-                whatsapp.getState()
+                state
+            )
+
+
+            /*
+             * ======================================
+             * ENVIAR GRUPOS AUTOMATICAMENTE
+             * ======================================
+             *
+             * O painel não precisa mais solicitar
+             * os grupos para recebê-los.
+             *
+             * Se o WhatsApp já encontrou os grupos,
+             * eles são enviados imediatamente.
+             */
+
+            const groups =
+                Array.isArray(
+                    state.groups
+                )
+                    ? state.groups
+                    : []
+
+
+            console.log(
+                '[SOCKET SERVER] Enviando grupos ao conectar:',
+                groups.length
+            )
+
+
+            socket.emit(
+                'groups',
+                groups
             )
 
 
@@ -125,6 +162,10 @@ function setupSocket(
              * ======================================
              * SOLICITAR GRUPOS
              * ======================================
+             *
+             * Mantemos este evento para permitir
+             * uma nova solicitação manual caso seja
+             * necessário no futuro.
              */
 
             socket.on(
@@ -136,27 +177,27 @@ function setupSocket(
                     )
 
 
-                    const state =
+                    const currentState =
                         whatsapp.getState()
 
 
-                    const groups =
+                    const currentGroups =
                         Array.isArray(
-                            state.groups
+                            currentState.groups
                         )
-                            ? state.groups
+                            ? currentState.groups
                             : []
 
 
                     console.log(
                         '[SOCKET SERVER] Enviando grupos para o painel:',
-                        groups.length
+                        currentGroups.length
                     )
 
 
                     socket.emit(
                         'groups',
-                        groups
+                        currentGroups
                     )
 
                 }
@@ -217,7 +258,8 @@ function setupSocket(
                         socket.emit(
                             'start-result',
                             {
-                                success: false,
+                                success:
+                                    false,
 
                                 message:
                                     'Erro ao iniciar WhatsApp.'
@@ -250,7 +292,8 @@ function setupSocket(
                         socket.emit(
                             'send-result',
                             {
-                                success: false,
+                                success:
+                                    false,
 
                                 message:
                                     'Sistema de mensagens não disponível.'
@@ -286,7 +329,8 @@ function setupSocket(
                         socket.emit(
                             'send-result',
                             {
-                                success: false,
+                                success:
+                                    false,
 
                                 message:
                                     'Erro ao enviar mensagem.'
@@ -324,3 +368,4 @@ function setupSocket(
 
 module.exports =
     setupSocket
+
