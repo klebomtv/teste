@@ -1,228 +1,154 @@
+
 // caminho: src/socket.js
 
 function setupSocket(
-io,
-whatsapp,
-auth
+    io,
+    whatsapp,
+    auth
 ) {
 
+    console.log(
+        '[SOCKET SERVER] Configurando Socket.IO...'
+    )
 
-console.log(
-    '[SOCKET SERVER] Configurando Socket.IO...'
-)
-
-
-/*
- * ==========================================
- * AUTENTICAÇÃO DO SOCKET
- * ==========================================
- */
-
-io.use(
-    (socket, next) => {
-
-        const cookies =
-            socket.handshake.headers.cookie
-
-
-        if (!cookies) {
+    io.on(
+        'connection',
+        (socket) => {
 
             console.log(
-                '[SOCKET SERVER] Conexão recusada: sem cookies.'
+                '[SOCKET SERVER] Cliente Socket.IO conectado.'
             )
 
-            return next(
-                new Error(
-                    'Não autenticado.'
+            /*
+             * ==========================================
+             * AUTENTICAÇÃO DO SOCKET
+             * ==========================================
+             */
+
+            const cookies =
+                socket.handshake.headers.cookie || ''
+
+            const sessionMatch =
+                cookies.match(
+                    /(?:^|;\s*)session=([^;]+)/
                 )
-            )
 
-        }
+            const sessionId =
+                sessionMatch
+                    ? sessionMatch[1]
+                    : null
 
-
-        const match =
-            cookies.match(
-                /(?:^|;\s*)session=([^;]+)/
-            )
-
-
-        if (!match) {
-
-            console.log(
-                '[SOCKET SERVER] Conexão recusada: sessão não encontrada.'
-            )
-
-            return next(
-                new Error(
-                    'Não autenticado.'
-                )
-            )
-
-        }
-
-
-        const sessionId =
-            decodeURIComponent(
-                match[1]
-            )
-
-
-        const valid =
-            auth.isSessionValid(
-                sessionId
-            )
-
-
-        if (!valid) {
-
-            console.log(
-                '[SOCKET SERVER] Conexão recusada: sessão inválida.'
-            )
-
-            return next(
-                new Error(
-                    'Sessão inválida.'
-                )
-            )
-
-        }
-
-
-        socket.sessionId =
-            sessionId
-
-
-        next()
-
-    }
-)
-
-
-/*
- * ==========================================
- * CONEXÃO
- * ==========================================
- */
-
-io.on(
-    'connection',
-    socket => {
-
-        console.log(
-            '[SOCKET SERVER] Cliente Socket.IO conectado.'
-        )
-
-
-        /*
-         * ======================================
-         * INICIAR WHATSAPP
-         * ======================================
-         */
-
-        socket.on(
-            'start-whatsapp',
-            async () => {
+            if (
+                !sessionId ||
+                !auth.isSessionValid(sessionId)
+            ) {
 
                 console.log(
-                    '[SOCKET SERVER] start-whatsapp recebido.'
+                    '[SOCKET SERVER] Socket não autenticado.'
                 )
 
+                socket.emit(
+                    'auth-error',
+                    {
+                        message:
+                            'Sessão inválida ou expirada.'
+                    }
+                )
 
-                try {
+                socket.disconnect()
 
-                    socket.emit(
-                        'starting-whatsapp'
-                    )
+                return
+            }
 
+            /*
+             * ==========================================
+             * ESTADO INICIAL DO WHATSAPP
+             * ==========================================
+             */
 
-                    const result =
-                        await whatsapp.start()
+            socket.emit(
+                'whatsapp-state',
+                whatsapp.getState()
+            )
 
+            /*
+             * ==========================================
+             * INICIAR WHATSAPP
+             * ==========================================
+             */
+
+            socket.on(
+                'start-whatsapp',
+                async () => {
 
                     console.log(
-                        '[SOCKET SERVER] Resultado do WhatsApp:',
-                        result
+                        '[SOCKET SERVER] start-whatsapp recebido.'
                     )
 
+                    try {
 
-                    socket.emit(
-                        'start-result',
-                        result
-                    )
+                        socket.emit(
+                            'starting-whatsapp'
+                        )
 
+                        await whatsapp.start()
 
-                    /*
-                     * Envia o estado atual
-                     * imediatamente.
-                     */
+                        socket.emit(
+                            'start-result',
+                            {
+                                success: true
+                            }
+                        )
 
-                    socket.emit(
-                        'whatsapp-state',
-                        whatsapp.getState()
-                    )
+                    } catch (error) {
 
-                } catch (error) {
+                        console.error(
+                            '[SOCKET SERVER] Erro ao iniciar WhatsApp:',
+                            error
+                        )
 
-                    console.error(
-                        '[SOCKET SERVER] Erro ao iniciar WhatsApp:',
-                        error
-                    )
+                        socket.emit(
+                            'start-result',
+                            {
+                                success: false,
+                                message:
+                                    error.message ||
+                                    'Não foi possível iniciar o WhatsApp.'
+                            }
+                        )
 
+                    }
 
-                    socket.emit(
-                        'start-result',
-                        {
-                            success: false,
-                            message:
-                                'Erro ao iniciar WhatsApp.'
-                        }
+                }
+            )
+
+            /*
+             * ==========================================
+             * DESCONECTAR
+             * ==========================================
+             */
+
+            socket.on(
+                'disconnect',
+                () => {
+
+                    console.log(
+                        '[SOCKET SERVER] Cliente Socket.IO desconectado.'
                     )
 
                 }
+            )
 
-            }
-        )
+        }
+    )
 
-
-        /*
-         * ======================================
-         * ESTADO INICIAL
-         * ======================================
-         */
-
-        socket.emit(
-            'whatsapp-state',
-            whatsapp.getState()
-        )
-
-
-        /*
-         * ======================================
-         * DESCONEXÃO
-         * ======================================
-         */
-
-        socket.on(
-            'disconnect',
-            () => {
-
-                console.log(
-                    '[SOCKET SERVER] Cliente Socket.IO desconectado.'
-                )
-
-            }
-        )
-
-    }
-)
-
-
-console.log(
-    '[SOCKET SERVER] Socket.IO configurado.'
-)
-
+    console.log(
+        '[SOCKET SERVER] Socket.IO configurado.'
+    )
 
 }
 
+
 module.exports =
-setupSocket
+    setupSocket
+

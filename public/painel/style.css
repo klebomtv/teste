@@ -6,71 +6,410 @@
 }
 
 
-html,
 body {
+
     margin: 0;
-    padding: 0;
-    min-height: 100%;
-}
 
-
-body {
-    font-family: Arial, sans-serif;
-}
-
-
-#app {
     min-height: 100vh;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        #f4f6f8;
+
+    color:
+        #17202a;
 }
 
 
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.panel {
 
-    padding: 20px;
+    width: min(
+        100% - 32px,
+        1000px
+    );
+
+    margin:
+        0 auto;
+
+    padding:
+        40px 0 60px;
 }
 
 
-.header h1 {
-    margin: 0;
+.panel-header {
+
+    display:
+        flex;
+
+    align-items:
+        flex-start;
+
+    justify-content:
+        space-between;
+
+    gap:
+        24px;
+
+    margin-bottom:
+        28px;
 }
 
 
-.status {
-    font-size: 14px;
+.eyebrow {
+
+    display:
+        block;
+
+    margin-bottom:
+        8px;
+
+    font-size:
+        12px;
+
+    font-weight:
+        700;
+
+    letter-spacing:
+        1.5px;
+
+    color:
+        #68737d;
 }
 
 
-.content {
-    display: grid;
+h1 {
+
+    margin:
+        0;
+
+    font-size:
+        36px;
+
+    line-height:
+        1.1;
+}
+
+
+h2 {
+
+    margin:
+        0;
+
+    font-size:
+        21px;
+}
+
+
+p {
+
+    margin:
+        10px 0 0;
+
+    color:
+        #68737d;
+}
+
+
+.status-grid {
+
+    display:
+        grid;
 
     grid-template-columns:
         repeat(
-            auto-fit,
+            2,
             minmax(
-                250px,
+                0,
                 1fr
             )
         );
 
-    gap: 20px;
+    gap:
+        16px;
 
-    padding: 20px;
+    margin-bottom:
+        20px;
 }
 
 
-.card {
-    padding: 20px;
+.status-card,
+.panel-card {
 
-    border: 1px solid #ddd;
+    background:
+        #ffffff;
 
-    border-radius: 8px;
+    border:
+        1px solid #e2e6ea;
+
+    border-radius:
+        14px;
+
+    box-shadow:
+        0 4px 18px
+        rgba(
+            0,
+            0,
+            0,
+            0.04
+        );
 }
 
 
-.card h2 {
-    margin-top: 0;
+.status-card {
+
+    padding:
+        20px;
+}
+
+
+.status-card span {
+
+    display:
+        block;
+
+    margin-bottom:
+        8px;
+
+    font-size:
+        13px;
+
+    color:
+        #68737d;
+}
+
+
+.status-card strong {
+
+    font-size:
+        17px;
+}
+
+
+.panel-card {
+
+    padding:
+        28px;
+}
+
+
+.card-header {
+
+    margin-bottom:
+        28px;
+
+    padding-bottom:
+        20px;
+
+    border-bottom:
+        1px solid #edf0f2;
+}
+
+
+.form-group {
+
+    margin-bottom:
+        20px;
+}
+
+
+label {
+
+    display:
+        block;
+
+    margin-bottom:
+        8px;
+
+    font-size:
+        14px;
+
+    font-weight:
+        700;
+}
+
+
+select,
+textarea {
+
+    width:
+        100%;
+
+    border:
+        1px solid #d7dce0;
+
+    border-radius:
+        9px;
+
+    background:
+        #ffffff;
+
+    color:
+        #17202a;
+
+    font:
+        inherit;
+
+    outline:
+        none;
+}
+
+
+select {
+
+    height:
+        46px;
+
+    padding:
+        0 12px;
+}
+
+
+textarea {
+
+    resize:
+        vertical;
+
+    min-height:
+        140px;
+
+    padding:
+        13px;
+}
+
+
+select:focus,
+textarea:focus {
+
+    border-color:
+        #7d8790;
+
+}
+
+
+.actions {
+
+    display:
+        flex;
+
+    gap:
+        10px;
+
+    flex-wrap:
+        wrap;
+}
+
+
+.button {
+
+    min-height:
+        44px;
+
+    padding:
+        0 18px;
+
+    border:
+        0;
+
+    border-radius:
+        9px;
+
+    font:
+        inherit;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+}
+
+
+.button-primary {
+
+    background:
+        #17202a;
+
+    color:
+        #ffffff;
+}
+
+
+.button-secondary {
+
+    background:
+        #e9edf0;
+
+    color:
+        #17202a;
+}
+
+
+.button:disabled {
+
+    opacity:
+        0.55;
+
+    cursor:
+        not-allowed;
+}
+
+
+.result {
+
+    min-height:
+        24px;
+
+    margin-top:
+        18px;
+
+    font-size:
+        14px;
+
+    color:
+        #68737d;
+}
+
+
+@media (
+    max-width: 700px
+) {
+
+    .panel {
+
+        width:
+            min(
+                100% - 20px,
+                1000px
+            );
+
+        padding-top:
+            24px;
+    }
+
+
+    .panel-header {
+
+        flex-direction:
+            column;
+    }
+
+
+    .status-grid {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .panel-card {
+
+        padding:
+            20px;
+    }
+
 }
 

@@ -1,386 +1,739 @@
+
 // caminho: src/whatsapp/index.js
 
 const state =
-require('./state')
+    require('./state')
+
 
 const auth =
-require('./auth')
+    require('./auth')
+
 
 const connection =
-require('./connection')
+    require('./connection')
+
 
 const qr =
-require('./qr')
+    require('./qr')
+
+
+const groups =
+    require('./groups')
+
+
+const messages =
+    require('./messages')
+
 
 const QR_TIMEOUT =
-60 * 1000
+    60 * 1000
+
 
 function createWhatsApp(
-io
+    io
 ) {
 
-
-let qrTimeout =
-    null
-
-
-function clearQRTimeout() {
-
-    if (qrTimeout) {
-
-        clearTimeout(
-            qrTimeout
-        )
-
-        qrTimeout =
-            null
-
-    }
-
-}
+    let qrTimeout =
+        null
 
 
-function startQRTimeout(
-    sock
-) {
+    function clearQRTimeout() {
 
-    clearQRTimeout()
+        if (qrTimeout) {
 
-
-    console.log(
-        '[WHATSAPP] Tempo para conexão: 60 segundos.'
-    )
-
-
-    qrTimeout =
-        setTimeout(
-            () => {
-
-                console.log(
-                    '[WHATSAPP] Tempo de conexão expirado.'
-                )
-
-
-                if (
-                    state.isConnected()
-                ) {
-
-                    return
-
-                }
-
-
-                try {
-
-                    if (sock) {
-
-                        sock.ws?.close()
-
-                    }
-
-                } catch (error) {
-
-                    console.error(
-                        '[WHATSAPP] Erro ao encerrar conexão expirada:',
-                        error
-                    )
-
-                }
-
-
-                state.reset()
-
-
-                console.log(
-                    '[WHATSAPP] Sessão QR encerrada após 60 segundos.'
-                )
-
-            },
-            QR_TIMEOUT
-        )
-
-}
-
-
-async function start() {
-
-    console.log(
-        '[WHATSAPP] Iniciando WhatsApp.'
-    )
-
-
-    if (
-        state.isStarted()
-    ) {
-
-        return {
-            success: false,
-            message:
-                'WhatsApp já foi iniciado.'
-        }
-
-    }
-
-
-    state.setStarted(
-        true
-    )
-
-
-    state.setConnected(
-        false
-    )
-
-
-    state.setQR(
-        false
-    )
-
-
-    state.setStatus(
-        'Iniciando WhatsApp...'
-    )
-
-
-    try {
-
-        const authState =
-            await auth.loadAuth()
-
-
-        const sock =
-            connection.createConnection(
-                authState
+            clearTimeout(
+                qrTimeout
             )
 
+            qrTimeout =
+                null
 
-        state.setSocket(
-            sock
-        )
-
-
-        sock.ev.on(
-            'creds.update',
-            authState.saveCreds
-        )
-
-
-        startQRTimeout(
-            sock
-        )
-
-
-        sock.ev.on(
-            'connection.update',
-            async update => {
-
-                const {
-                    connection:
-                        connectionState,
-                    qr:
-                        qrCode
-                } =
-                    update
-
-
-                /*
-                 * ==================================
-                 * QR CODE
-                 * ==================================
-                 */
-
-                if (
-                    qrCode
-                ) {
-
-                    console.log(
-                        '[WHATSAPP] QR Code recebido.'
-                    )
-
-
-                    state.setQR(
-                        true
-                    )
-
-
-                    state.setStatus(
-                        'Aguardando leitura do QR Code...'
-                    )
-
-
-                    await qr.generateQR(
-                        qrCode
-                    )
-
-
-                    io?.emit(
-                        'qr-updated'
-                    )
-
-
-                    io?.emit(
-                        'whatsapp-state',
-                        state.getState()
-                    )
-
-                }
-
-
-                /*
-                 * ==================================
-                 * CONECTADO
-                 * ==================================
-                 */
-
-                if (
-                    connectionState === 'open'
-                ) {
-
-                    console.log(
-                        '[WHATSAPP] WhatsApp conectado!'
-                    )
-
-
-                    clearQRTimeout()
-
-
-                    state.setConnected(
-                        true
-                    )
-
-
-                    state.setQR(
-                        false
-                    )
-
-
-                    state.setStatus(
-                        'WhatsApp conectado.'
-                    )
-
-
-                    io?.emit(
-                        'connected',
-                        true
-                    )
-
-
-                    io?.emit(
-                        'whatsapp-state',
-                        state.getState()
-                    )
-
-                }
-
-
-                /*
-                 * ==================================
-                 * DESCONECTADO
-                 * ==================================
-                 */
-
-                if (
-                    connectionState === 'close'
-                ) {
-
-                    console.log(
-                        '[WHATSAPP] Conexão fechada.'
-                    )
-
-
-                    clearQRTimeout()
-
-
-                    state.setConnected(
-                        false
-                    )
-
-
-                    state.setQR(
-                        false
-                    )
-
-
-                    state.setStatus(
-                        'WhatsApp desconectado.'
-                    )
-
-
-                    io?.emit(
-                        'connected',
-                        false
-                    )
-
-
-                    io?.emit(
-                        'whatsapp-state',
-                        state.getState()
-                    )
-
-                }
-
-            }
-        )
-
-
-        console.log(
-            '[WHATSAPP] Baileys iniciado.'
-        )
-
-
-        return {
-            success: true,
-            message:
-                'WhatsApp iniciado.'
         }
 
-    } catch (error) {
+    }
 
-        console.error(
-            '[WHATSAPP] Erro ao iniciar:',
-            error
-        )
 
+    function startQRTimeout(
+        sock
+    ) {
 
         clearQRTimeout()
 
 
-        state.reset()
+        console.log(
+            '[WHATSAPP] Tempo para conexão: 60 segundos.'
+        )
+
+
+        qrTimeout =
+            setTimeout(
+                () => {
+
+                    console.log(
+                        '[WHATSAPP] Tempo de conexão expirado.'
+                    )
+
+
+                    if (
+                        state.isConnected()
+                    ) {
+
+                        return
+
+                    }
+
+
+                    try {
+
+                        if (sock) {
+
+                            sock.ws?.close()
+
+                        }
+
+                    } catch (error) {
+
+                        console.error(
+                            '[WHATSAPP] Erro ao encerrar conexão expirada:',
+                            error
+                        )
+
+                    }
+
+
+                    state.reset()
+
+
+                    io?.emit(
+                        'whatsapp-state',
+                        state.getState()
+                    )
+
+
+                    console.log(
+                        '[WHATSAPP] Sessão QR encerrada após 60 segundos.'
+                    )
+
+                },
+                QR_TIMEOUT
+            )
+
+    }
+
+
+    async function loadGroups() {
+
+        const sock =
+            state.getSocket()
+
+
+        if (
+            !sock ||
+            !state.isConnected()
+        ) {
+
+            return []
+
+        }
+
+
+        try {
+
+            console.log(
+                '[WHATSAPP] Carregando grupos...'
+            )
+
+
+            const list =
+                await groups.loadGroups(
+                    sock
+                )
+
+
+            state.setGroups(
+                list
+            )
+
+
+            console.log(
+                `[WHATSAPP] ${list.length} grupos encontrados.`
+            )
+
+
+            io?.emit(
+                'groups',
+                list
+            )
+
+
+            io?.emit(
+                'whatsapp-state',
+                state.getState()
+            )
+
+
+            return list
+
+        } catch (error) {
+
+            console.error(
+                '[WHATSAPP] Erro ao carregar grupos:',
+                error
+            )
+
+
+            state.setGroups(
+                []
+            )
+
+
+            io?.emit(
+                'groups',
+                []
+            )
+
+
+            return []
+
+        }
+
+    }
+
+
+    async function start() {
+
+        console.log(
+            '[WHATSAPP] Iniciando WhatsApp.'
+        )
+
+
+        if (
+            state.isStarted()
+        ) {
+
+            return {
+
+                success:
+                    false,
+
+                message:
+                    'WhatsApp já foi iniciado.'
+
+            }
+
+        }
+
+
+        state.setStarted(
+            true
+        )
+
+
+        state.setConnected(
+            false
+        )
+
+
+        state.setQR(
+            false
+        )
+
+
+        state.setStatus(
+            'Iniciando WhatsApp...'
+        )
+
+
+        io?.emit(
+            'whatsapp-state',
+            state.getState()
+        )
+
+
+        try {
+
+            const authState =
+                await auth.loadAuth()
+
+
+            const sock =
+                connection.createConnection(
+                    authState
+                )
+
+
+            state.setSocket(
+                sock
+            )
+
+
+            sock.ev.on(
+                'creds.update',
+                authState.saveCreds
+            )
+
+
+            startQRTimeout(
+                sock
+            )
+
+
+            sock.ev.on(
+                'connection.update',
+                async update => {
+
+                    const {
+
+                        connection:
+                            connectionState,
+
+                        qr:
+                            qrCode
+
+                    } =
+                        update
+
+
+                    /*
+                     * ==================================
+                     * QR CODE
+                     * ==================================
+                     */
+
+                    if (
+                        qrCode
+                    ) {
+
+                        console.log(
+                            '[WHATSAPP] QR Code recebido.'
+                        )
+
+
+                        state.setQR(
+                            true
+                        )
+
+
+                        state.setStatus(
+                            'Aguardando leitura do QR Code...'
+                        )
+
+
+                        await qr.generateQR(
+                            qrCode
+                        )
+
+
+                        io?.emit(
+                            'qr-updated'
+                        )
+
+
+                        io?.emit(
+                            'whatsapp-state',
+                            state.getState()
+                        )
+
+                    }
+
+
+                    /*
+                     * ==================================
+                     * CONECTADO
+                     * ==================================
+                     */
+
+                    if (
+                        connectionState ===
+                        'open'
+                    ) {
+
+                        console.log(
+                            '[WHATSAPP] WhatsApp conectado!'
+                        )
+
+
+                        clearQRTimeout()
+
+
+                        state.setConnected(
+                            true
+                        )
+
+
+                        state.setQR(
+                            false
+                        )
+
+
+                        state.setStatus(
+                            'WhatsApp conectado.'
+                        )
+
+
+                        io?.emit(
+                            'connected',
+                            true
+                        )
+
+
+                        io?.emit(
+                            'whatsapp-state',
+                            state.getState()
+                        )
+
+
+                        /*
+                         * Carrega os grupos
+                         * depois da conexão.
+                         */
+
+                        await loadGroups()
+
+                    }
+
+
+                    /*
+                     * ==================================
+                     * DESCONECTADO
+                     * ==================================
+                     */
+
+                    if (
+                        connectionState ===
+                        'close'
+                    ) {
+
+                        console.log(
+                            '[WHATSAPP] Conexão fechada.'
+                        )
+
+
+                        clearQRTimeout()
+
+
+                        state.setConnected(
+                            false
+                        )
+
+
+                        state.setQR(
+                            false
+                        )
+
+
+                        state.setStatus(
+                            'WhatsApp desconectado.'
+                        )
+
+
+                        state.setGroups(
+                            []
+                        )
+
+
+                        io?.emit(
+                            'connected',
+                            false
+                        )
+
+
+                        io?.emit(
+                            'groups',
+                            []
+                        )
+
+
+                        io?.emit(
+                            'whatsapp-state',
+                            state.getState()
+                        )
+
+                    }
+
+                }
+            )
+
+
+            console.log(
+                '[WHATSAPP] Baileys iniciado.'
+            )
+
+
+            return {
+
+                success:
+                    true,
+
+                message:
+                    'WhatsApp iniciado.'
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                '[WHATSAPP] Erro ao iniciar:',
+                error
+            )
+
+
+            clearQRTimeout()
+
+
+            state.reset()
+
+
+            io?.emit(
+                'whatsapp-state',
+                state.getState()
+            )
+
+
+            return {
+
+                success:
+                    false,
+
+                message:
+                    error.message ||
+                    'Erro ao iniciar WhatsApp.'
+
+            }
+
+        }
+
+    }
+
+
+    async function sendMessage(
+        target,
+        message
+    ) {
+
+        const sock =
+            state.getSocket()
+
+
+        if (
+            !state.isConnected()
+        ) {
+
+            throw new Error(
+                'WhatsApp não está conectado.'
+            )
+
+        }
+
+
+        return messages.sendMessage(
+            sock,
+            target,
+            message
+        )
+
+    }
+
+
+    async function sendToAll(
+        message
+    ) {
+
+        const sock =
+            state.getSocket()
+
+
+        if (
+            !state.isConnected()
+        ) {
+
+            throw new Error(
+                'WhatsApp não está conectado.'
+            )
+
+        }
+
+
+        if (
+            state.isSending()
+        ) {
+
+            throw new Error(
+                'Já existe um envio em andamento.'
+            )
+
+        }
+
+
+        const list =
+            state.getGroups()
+
+
+        if (
+            !list.length
+        ) {
+
+            throw new Error(
+                'Nenhum grupo disponível.'
+            )
+
+        }
+
+
+        state.setSending(
+            true
+        )
+
+
+        state.setCancelSending(
+            false
+        )
+
+
+        io?.emit(
+            'send-started',
+            {
+                total:
+                    list.length
+            }
+        )
+
+
+        try {
+
+            const result =
+                await messages.sendToGroups(
+                    sock,
+                    list,
+                    message,
+                    () =>
+                        state.shouldCancelSending(),
+
+                    progress => {
+
+                        io?.emit(
+                            'send-progress',
+                            progress
+                        )
+
+                    }
+                )
+
+
+            if (
+                result.cancelled
+            ) {
+
+                io?.emit(
+                    'send-cancelled',
+                    result
+                )
+
+            } else {
+
+                io?.emit(
+                    'send-finished',
+                    result
+                )
+
+            }
+
+
+            return result
+
+        } finally {
+
+            state.setSending(
+                false
+            )
+
+            state.setCancelSending(
+                false
+            )
+
+
+            io?.emit(
+                'whatsapp-state',
+                state.getState()
+            )
+
+        }
+
+    }
+
+
+    function cancelSending() {
+
+        if (
+            !state.isSending()
+        ) {
+
+            return {
+
+                success:
+                    false,
+
+                message:
+                    'Nenhum envio em andamento.'
+
+            }
+
+        }
+
+
+        state.setCancelSending(
+            true
+        )
 
 
         return {
-            success: false,
+
+            success:
+                true,
+
             message:
-                'Erro ao iniciar WhatsApp.'
+                'Cancelamento solicitado.'
+
         }
+
+    }
+
+
+    function getState() {
+
+        return state.getState()
+
+    }
+
+
+    function getSocket() {
+
+        return state.getSocket()
+
+    }
+
+
+    return {
+
+        start,
+
+        getState,
+
+        getSocket,
+
+        loadGroups,
+
+        sendMessage,
+
+        sendToAll,
+
+        cancelSending
 
     }
 
 }
 
 
-function getState() {
-
-    return state.getState()
-
-}
-
-
-function getSocket() {
-
-    return state.getSocket()
-
-}
-
-
-return {
-    start,
-    getState,
-    getSocket
-}
-
-
-}
-
 module.exports =
-createWhatsApp
+    createWhatsApp
+

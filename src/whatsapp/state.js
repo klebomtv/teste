@@ -12,25 +12,27 @@ let currentStatus =
 
 let currentQR = false
 
+let groups = []
+
+let sending = false
+
+let cancelSending = false
+
+
+function setSocket(
+    value
+) {
+
+    sock =
+        value
+
+}
+
 
 function getSocket() {
 
     return sock
-}
 
-
-function setSocket(
-    newSocket
-) {
-
-    sock =
-        newSocket
-}
-
-
-function isStarted() {
-
-    return started
 }
 
 
@@ -40,12 +42,14 @@ function setStarted(
 
     started =
         value
+
 }
 
 
-function isConnected() {
+function isStarted() {
 
-    return connected
+    return started
+
 }
 
 
@@ -55,27 +59,24 @@ function setConnected(
 
     connected =
         value
+
 }
 
 
-function getStatus() {
+function isConnected() {
 
-    return currentStatus
+    return connected
+
 }
 
 
 function setStatus(
-    status
+    value
 ) {
 
     currentStatus =
-        status
-}
+        value
 
-
-function hasQR() {
-
-    return currentQR
 }
 
 
@@ -85,6 +86,60 @@ function setQR(
 
     currentQR =
         value
+
+}
+
+
+function setGroups(
+    value
+) {
+
+    groups =
+        Array.isArray(value)
+            ? value
+            : []
+
+}
+
+
+function getGroups() {
+
+    return groups
+
+}
+
+
+function setSending(
+    value
+) {
+
+    sending =
+        value
+
+}
+
+
+function isSending() {
+
+    return sending
+
+}
+
+
+function setCancelSending(
+    value
+) {
+
+    cancelSending =
+        value
+
+}
+
+
+function shouldCancelSending() {
+
+    return cancelSending
+
 }
 
 
@@ -104,6 +159,16 @@ function reset() {
 
     currentQR =
         false
+
+    groups =
+        []
+
+    sending =
+        false
+
+    cancelSending =
+        false
+
 }
 
 
@@ -119,30 +184,45 @@ function getState() {
             currentStatus,
 
         qr:
-            currentQR
+            currentQR,
+
+        groups:
+            groups,
+
+        sending
+
     }
+
 }
 
 
 module.exports = {
 
-    getSocket,
     setSocket,
+    getSocket,
 
-    isStarted,
     setStarted,
+    isStarted,
 
-    isConnected,
     setConnected,
+    isConnected,
 
-    getStatus,
     setStatus,
 
-    hasQR,
     setQR,
+
+    setGroups,
+    getGroups,
+
+    setSending,
+    isSending,
+
+    setCancelSending,
+    shouldCancelSending,
 
     reset,
 
     getState
+
 }
 

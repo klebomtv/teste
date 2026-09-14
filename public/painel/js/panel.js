@@ -1,14 +1,25 @@
 
 // caminho: public/painel/js/panel.js
 
-console.log(
-    '[PAINEL] Nova interface carregada.'
-)
+import {
+    setupGroups
+} from './groups.js'
+
+
+import {
+    setupMessages
+} from './messages.js'
 
 
 const socket =
     io()
 
+
+/*
+ * ==========================================
+ * ELEMENTOS
+ * ==========================================
+ */
 
 const connectionStatus =
     document.getElementById(
@@ -22,44 +33,28 @@ const whatsappStatus =
     )
 
 
-const systemStatus =
+const logout =
     document.getElementById(
-        'system-status'
+        'logout'
     )
 
+
+/*
+ * ==========================================
+ * SOCKET
+ * ==========================================
+ */
 
 socket.on(
     'connect',
     () => {
 
-        console.log(
-            '[PAINEL] Socket conectado.',
-            socket.id
-        )
+        if (connectionStatus) {
 
+            connectionStatus.textContent =
+                'Servidor conectado.'
 
-        connectionStatus.textContent =
-            'Socket conectado.'
-
-        systemStatus.textContent =
-            'Painel conectado ao servidor.'
-
-    }
-)
-
-
-socket.on(
-    'connect_error',
-    error => {
-
-        console.error(
-            '[PAINEL] Erro no Socket:',
-            error
-        )
-
-
-        connectionStatus.textContent =
-            'Erro na conexão.'
+        }
 
     }
 )
@@ -69,18 +64,151 @@ socket.on(
     'disconnect',
     () => {
 
-        console.log(
-            '[PAINEL] Socket desconectado.'
-        )
+        if (connectionStatus) {
 
+            connectionStatus.textContent =
+                'Servidor desconectado.'
 
-        connectionStatus.textContent =
-            'Socket desconectado.'
+        }
 
     }
 )
 
 
-whatsappStatus.textContent =
-    'Aguardando conexão do WhatsApp.'
+/*
+ * ==========================================
+ * WHATSAPP
+ * ==========================================
+ */
+
+socket.on(
+    'whatsapp-state',
+    state => {
+
+        if (!whatsappStatus) {
+            return
+        }
+
+
+        if (
+            state?.connected
+        ) {
+
+            whatsappStatus.textContent =
+                'WhatsApp conectado.'
+
+            return
+
+        }
+
+
+        if (
+            state?.started
+        ) {
+
+            whatsappStatus.textContent =
+                state.status ||
+                'WhatsApp iniciando.'
+
+            return
+
+        }
+
+
+        whatsappStatus.textContent =
+            'WhatsApp desconectado.'
+
+    }
+)
+
+
+socket.on(
+    'starting-whatsapp',
+    () => {
+
+        if (whatsappStatus) {
+
+            whatsappStatus.textContent =
+                'Iniciando WhatsApp...'
+
+        }
+
+    }
+)
+
+
+socket.on(
+    'connected',
+    connected => {
+
+        if (!whatsappStatus) {
+            return
+        }
+
+
+        whatsappStatus.textContent =
+            connected
+                ? 'WhatsApp conectado.'
+                : 'WhatsApp desconectado.'
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * MÓDULOS DO PAINEL
+ * ==========================================
+ */
+
+setupGroups(
+    socket
+)
+
+
+setupMessages(
+    socket
+)
+
+
+/*
+ * ==========================================
+ * LOGOUT
+ * ==========================================
+ */
+
+if (logout) {
+
+    logout.addEventListener(
+        'click',
+        async () => {
+
+            try {
+
+                await fetch(
+                    '/auth/logout',
+                    {
+                        method: 'POST',
+                        credentials:
+                            'same-origin'
+                    }
+                )
+
+
+                window.location.href =
+                    '/login/'
+
+            } catch (error) {
+
+                console.error(
+                    '[PAINEL] Erro ao sair:',
+                    error
+                )
+
+            }
+
+        }
+    )
+
+}
 

@@ -17,8 +17,9 @@ require('socket.io')
 const initializeSystem =
 require('./src/startup')
 
+
 const createWhatsApp =
-require('./src/whatsapp')
+require('./src/whatsapp/index')
 
 const setupSocket =
 require('./src/socket')
