@@ -21,7 +21,7 @@ const groups =
 
 
 const messages =
-    require('./message')
+    require('./messages')
 
 
 const QR_TIMEOUT =
