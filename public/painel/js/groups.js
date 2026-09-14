@@ -1,6 +1,9 @@
+
 // caminho: public/painel/js/groups.js
 
-export function setupGroups(socket) {
+export function setupGroups(
+    socket
+) {
 
     const groupSelect =
         document.getElementById(
@@ -15,142 +18,72 @@ export function setupGroups(socket) {
         )
 
         return
-    }
-
-
-    function renderGroups(
-        groups
-    ) {
-
-        groupSelect.innerHTML = ''
-
-
-        const defaultOption =
-            document.createElement(
-                'option'
-            )
-
-
-        defaultOption.value = ''
-
-        defaultOption.textContent =
-            'Selecione um grupo'
-
-
-        groupSelect.appendChild(
-            defaultOption
-        )
-
-
-        if (
-            !Array.isArray(groups) ||
-            groups.length === 0
-        ) {
-
-            console.log(
-                '[GROUPS] Nenhum grupo recebido.'
-            )
-
-            return
-        }
-
-
-        console.log(
-            `[GROUPS] Renderizando ${groups.length} grupos.`
-        )
-
-
-        groups.forEach(
-            group => {
-
-                const option =
-                    document.createElement(
-                        'option'
-                    )
-
-
-                option.value =
-                    group.id
-
-
-                option.textContent =
-                    group.name ||
-                    'Grupo sem nome'
-
-
-                groupSelect.appendChild(
-                    option
-                )
-
-            }
-        )
 
     }
 
-
-    /*
-     * ==========================================
-     * GRUPOS
-     * ==========================================
-     *
-     * Usado quando o servidor envia
-     * a lista diretamente.
-     */
 
     socket.on(
         'groups',
         groups => {
 
-            console.log(
-                '[GROUPS] Evento groups recebido:',
-                groups
-            )
+            groupSelect.innerHTML = ''
 
 
-            renderGroups(
-                groups
-            )
-
-        }
-    )
+            const defaultOption =
+                document.createElement(
+                    'option'
+                )
 
 
-    /*
-     * ==========================================
-     * ESTADO DO WHATSAPP
-     * ==========================================
-     *
-     * Quando o painel entra depois que
-     * os grupos já foram carregados,
-     * eles vêm dentro de whatsapp-state.
-     */
+            defaultOption.value =
+                ''
 
-    socket.on(
-        'whatsapp-state',
-        state => {
+            defaultOption.textContent =
+                'Selecione um grupo'
 
-            console.log(
-                '[GROUPS] Estado recebido:',
-                state
+
+            groupSelect.appendChild(
+                defaultOption
             )
 
 
             if (
-                !state ||
-                !Array.isArray(
-                    state.groups
-                )
+                !Array.isArray(groups) ||
+                groups.length === 0
             ) {
 
                 return
+
             }
 
 
-            renderGroups(
-                state.groups
+            groups.forEach(
+                group => {
+
+                    const option =
+                        document.createElement(
+                            'option'
+                        )
+
+
+                    option.value =
+                        group.id
+
+
+                    option.textContent =
+                        group.name ||
+                        'Grupo sem nome'
+
+
+                    groupSelect.appendChild(
+                        option
+                    )
+
+                }
             )
 
         }
     )
 
 }
+
