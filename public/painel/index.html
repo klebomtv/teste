@@ -1,8 +1,8 @@
+
 <!-- caminho: public/painel/index.html -->
 
 <!DOCTYPE html>
-
-<html lang="pt-BR">
+<html lang="en">
 
 <head>
 
@@ -13,20 +13,308 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Grupos</title>
+    <title>Broadcast Panel</title>
+
+    <link
+        rel="stylesheet"
+        href="/painel/style.css"
+    >
 
 </head>
 
 <body>
 
-    <h1>
-        Grupos
-    </h1>
+    <main class="app">
 
-    <div id="groups">
-        Carregando grupos...
-    </div>
+        <header class="header">
 
+            <div class="brand">
+
+                <div class="brand-mark">
+                    W
+                </div>
+
+                <div>
+
+                    <h1>
+                        Broadcast
+                    </h1>
+
+                    <span>
+                        WhatsApp messaging panel
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="connection">
+
+                <span
+                    id="connection-dot"
+                    class="connection-dot"
+                ></span>
+
+                <span id="connection-status">
+                    Connecting...
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <section class="workspace">
+
+
+            <!-- GROUPS -->
+
+            <section class="card groups-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h2>
+                            Groups
+                        </h2>
+
+                        <p>
+                            Select where you want to send your message.
+                        </p>
+
+                    </div>
+
+
+                    <span
+                        id="group-count"
+                        class="counter"
+                    >
+                        0
+                    </span>
+
+                </div>
+
+
+                <div class="group-actions">
+
+                    <label class="select-all">
+
+                        <input
+                            type="checkbox"
+                            id="select-all"
+                        >
+
+                        <span>
+                            Select all
+                        </span>
+
+                    </label>
+
+
+                    <span
+                        id="selected-count"
+                        class="selected-count"
+                    >
+                        0 selected
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="groups"
+                    class="groups-list"
+                >
+
+                    <div class="loading">
+                        Loading groups...
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- MESSAGE -->
+
+            <section class="card composer-card">
+
+                <div class="card-header">
+
+                    <div>
+
+                        <h2>
+                            Message
+                        </h2>
+
+                        <p>
+                            Compose the message you want to broadcast.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="composer">
+
+                    <label
+                        for="message"
+                        class="field-label"
+                    >
+                        Message
+                    </label>
+
+
+                    <textarea
+                        id="message"
+                        placeholder="Write your message here..."
+                        maxlength="4096"
+                    ></textarea>
+
+
+                    <div class="composer-footer">
+
+                        <span id="character-count">
+                            0 / 4096
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- COOLDOWN -->
+
+                <div class="cooldown">
+
+                    <div>
+
+                        <span class="cooldown-title">
+                            Sending protection
+                        </span>
+
+                        <span class="cooldown-description">
+                            Messages are sent using the configured cooldown.
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        id="cooldown-status"
+                        class="cooldown-status"
+                    >
+                        Ready
+                    </div>
+
+                </div>
+
+
+                <!-- SEND -->
+
+                <div class="send-area">
+
+                    <div class="send-info">
+
+                        <strong id="send-target-count">
+                            0 groups
+                        </strong>
+
+                        <span>
+                            selected for delivery
+                        </span>
+
+                    </div>
+
+
+                    <div class="send-buttons">
+
+                        <button
+                            id="cancel-send"
+                            class="button button-secondary"
+                            type="button"
+                            hidden
+                        >
+                            Cancel
+                        </button>
+
+
+                        <button
+                            id="send-message"
+                            class="button button-primary"
+                            type="button"
+                            disabled
+                        >
+                            Send message
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PROGRESS -->
+
+                <div
+                    id="progress-area"
+                    class="progress-area"
+                    hidden
+                >
+
+                    <div class="progress-header">
+
+                        <span>
+                            Sending...
+                        </span>
+
+                        <span id="progress-text">
+                            0 / 0
+                        </span>
+
+                    </div>
+
+
+                    <div class="progress-bar">
+
+                        <div
+                            id="progress-fill"
+                            class="progress-fill"
+                        ></div>
+
+                    </div>
+
+
+                    <div
+                        id="send-status"
+                        class="send-status"
+                    >
+                        Preparing delivery...
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+
+        <footer class="footer">
+
+            <span>
+                WhatsApp Broadcast
+            </span>
+
+        </footer>
+
+    </main>
+
+
+    <!-- ========================================= -->
+    <!-- SOCKET.IO                                 -->
+    <!-- ========================================= -->
 
     <script
         src="/socket.io/socket.io.js"
@@ -35,8 +323,37 @@
 
     <script>
 
+        /*
+         * ==========================================
+         * SOCKET.IO
+         * ==========================================
+         */
+
         const socket =
             io()
+
+
+        console.log(
+            '[PAINEL] Socket inicializado.'
+        )
+
+
+        /*
+         * ==========================================
+         * ELEMENTOS
+         * ==========================================
+         */
+
+        const connectionStatus =
+            document.getElementById(
+                'connection-status'
+            )
+
+
+        const connectionDot =
+            document.getElementById(
+                'connection-dot'
+            )
 
 
         const groupsContainer =
@@ -45,105 +362,252 @@
             )
 
 
-        function showGroups(
-            groups
-        ) {
-
-            console.log(
-                '[TESTE] Grupos recebidos:',
-                groups
+        const groupCount =
+            document.getElementById(
+                'group-count'
             )
 
 
+        const selectedCount =
+            document.getElementById(
+                'selected-count'
+            )
+
+
+        const selectAll =
+            document.getElementById(
+                'select-all'
+            )
+
+
+        const message =
+            document.getElementById(
+                'message'
+            )
+
+
+        const characterCount =
+            document.getElementById(
+                'character-count'
+            )
+
+
+        const sendTargetCount =
+            document.getElementById(
+                'send-target-count'
+            )
+
+
+        const sendButton =
+            document.getElementById(
+                'send-message'
+            )
+
+
+        const cancelButton =
+            document.getElementById(
+                'cancel-send'
+            )
+
+
+        const progressArea =
+            document.getElementById(
+                'progress-area'
+            )
+
+
+        const cooldownStatus =
+            document.getElementById(
+                'cooldown-status'
+            )
+
+
+        /*
+         * ==========================================
+         * ESTADO LOCAL
+         * ==========================================
+         */
+
+        let availableGroups =
+            []
+
+
+        /*
+         * ==========================================
+         * STATUS DA CONEXÃO
+         * ==========================================
+         */
+
+        function setConnectionStatus(
+            connected
+        ) {
+
             if (
-                !Array.isArray(groups) ||
-                groups.length === 0
+                connected
             ) {
 
-                groupsContainer.innerHTML =
-                    '<p>Nenhum grupo encontrado.</p>'
+                connectionStatus.textContent =
+                    'Connected'
+
+                connectionDot.classList.add(
+                    'connected'
+                )
 
                 return
+
             }
 
 
-            groupsContainer.innerHTML = ''
+            connectionStatus.textContent =
+                'Disconnected'
 
-
-            groups.forEach(
-                group => {
-
-                    const item =
-                        document.createElement(
-                            'div'
-                        )
-
-
-                    item.textContent =
-                        group.name
-
-
-                    item.dataset.id =
-                        group.id
-
-
-                    groupsContainer.appendChild(
-                        item
-                    )
-
-                }
+            connectionDot.classList.remove(
+                'connected'
             )
 
         }
 
+
+        /*
+         * ==========================================
+         * SOCKET CONECTADO
+         * ==========================================
+         */
 
         socket.on(
             'connect',
             () => {
 
                 console.log(
-                    '[TESTE] Socket conectado:',
+                    '[PAINEL] Socket conectado:',
                     socket.id
                 )
 
+
+                console.log(
+                    '[PAINEL] Transport:',
+                    socket.io.engine.transport.name
+                )
+
+
+                setConnectionStatus(
+                    true
+                )
+
             }
         )
 
+
+        /*
+         * ==========================================
+         * SOCKET DESCONECTADO
+         * ==========================================
+         */
 
         socket.on(
             'disconnect',
-            () => {
+            reason => {
 
-                console.log(
-                    '[TESTE] Socket desconectado.'
+                console.error(
+                    '[PAINEL] Socket desconectado:',
+                    reason
+                )
+
+
+                setConnectionStatus(
+                    false
                 )
 
             }
         )
 
+
+        /*
+         * ==========================================
+         * ERRO DE CONEXÃO
+         * ==========================================
+         */
 
         socket.on(
-            'groups',
-            groups => {
+            'connect_error',
+            error => {
 
-                console.log(
-                    '[TESTE] Evento groups recebido.'
-                )
-
-                showGroups(
-                    groups
+                console.error(
+                    '[PAINEL] Erro de conexão Socket.IO:',
+                    error
                 )
 
             }
         )
 
+
+        /*
+         * ==========================================
+         * ENGINE.IO
+         * ==========================================
+         */
+
+        socket.io.engine.on(
+            'close',
+            reason => {
+
+                console.error(
+                    '[PAINEL] Engine.IO close:',
+                    reason
+                )
+
+            }
+        )
+
+
+        socket.io.engine.on(
+            'error',
+            error => {
+
+                console.error(
+                    '[PAINEL] Engine.IO error:',
+                    error
+                )
+
+            }
+        )
+
+
+        /*
+         * ==========================================
+         * AUTENTICAÇÃO
+         * ==========================================
+         */
+
+        socket.on(
+            'auth-error',
+            data => {
+
+                console.error(
+                    '[PAINEL] Erro de autenticação:',
+                    data
+                )
+
+
+                connectionStatus.textContent =
+                    'Authentication error'
+
+            }
+        )
+
+
+        /*
+         * ==========================================
+         * ESTADO DO WHATSAPP
+         * ==========================================
+         */
 
         socket.on(
             'whatsapp-state',
             state => {
 
                 console.log(
-                    '[TESTE] Estado recebido:',
+                    '[PAINEL] Estado recebido:',
                     state
                 )
 
@@ -155,7 +619,7 @@
                     )
                 ) {
 
-                    showGroups(
+                    renderGroups(
                         state.groups
                     )
 
@@ -165,24 +629,340 @@
         )
 
 
-        socket.on(
-            'auth-error',
-            data => {
+        /*
+         * ==========================================
+         * GRUPOS
+         * ==========================================
+         */
 
-                console.error(
-                    '[TESTE] Erro de autenticação:',
-                    data
+        socket.on(
+            'groups',
+            groups => {
+
+                console.log(
+                    '[PAINEL] Evento groups recebido:',
+                    groups
                 )
 
 
-                groupsContainer.innerHTML =
-                    '<p>Sessão não autenticada.</p>'
+                renderGroups(
+                    groups
+                )
 
             }
         )
+
+
+        function renderGroups(
+            groups
+        ) {
+
+            availableGroups =
+                Array.isArray(groups)
+                    ? groups
+                    : []
+
+
+            groupCount.textContent =
+                availableGroups.length
+
+
+            groupsContainer.innerHTML =
+                ''
+
+
+            if (
+                availableGroups.length === 0
+            ) {
+
+                groupsContainer.innerHTML =
+                    '<div class="loading">No groups found.</div>'
+
+                updateSelection()
+
+                return
+
+            }
+
+
+            availableGroups.forEach(
+                (
+                    group,
+                    index
+                ) => {
+
+                    const label =
+                        document.createElement(
+                            'label'
+                        )
+
+
+                    label.className =
+                        'group-item'
+
+
+                    const checkbox =
+                        document.createElement(
+                            'input'
+                        )
+
+
+                    checkbox.type =
+                        'checkbox'
+
+
+                    checkbox.className =
+                        'group-checkbox'
+
+
+                    checkbox.value =
+                        group.id
+
+
+                    checkbox.dataset.index =
+                        index
+
+
+                    const name =
+                        document.createElement(
+                            'span'
+                        )
+
+
+                    name.textContent =
+                        group.name ||
+                        'Unnamed group'
+
+
+                    label.appendChild(
+                        checkbox
+                    )
+
+
+                    label.appendChild(
+                        name
+                    )
+
+
+                    groupsContainer.appendChild(
+                        label
+                    )
+
+
+                    checkbox.addEventListener(
+                        'change',
+                        updateSelection
+                    )
+
+                }
+            )
+
+
+            updateSelection()
+
+        }
+
+
+        /*
+         * ==========================================
+         * SELEÇÃO DOS GRUPOS
+         * ==========================================
+         */
+
+        function getSelectedGroups() {
+
+            return [
+                ...document.querySelectorAll(
+                    '.group-checkbox:checked'
+                )
+            ]
+            .map(
+                checkbox =>
+                    checkbox.value
+            )
+
+        }
+
+
+        function updateSelection() {
+
+            const selected =
+                getSelectedGroups()
+
+
+            const total =
+                availableGroups.length
+
+
+            selectedCount.textContent =
+                `${selected.length} selected`
+
+
+            sendTargetCount.textContent =
+                `${selected.length} ${
+                    selected.length === 1
+                        ? 'group'
+                        : 'groups'
+                }`
+
+
+            selectAll.checked =
+                total > 0 &&
+                selected.length === total
+
+
+            selectAll.indeterminate =
+                selected.length > 0 &&
+                selected.length < total
+
+
+            updateSendButton()
+
+        }
+
+
+        selectAll.addEventListener(
+            'change',
+            () => {
+
+                const checkboxes =
+                    document.querySelectorAll(
+                        '.group-checkbox'
+                    )
+
+
+                checkboxes.forEach(
+                    checkbox => {
+
+                        checkbox.checked =
+                            selectAll.checked
+
+                    }
+                )
+
+
+                updateSelection()
+
+            }
+        )
+
+
+        /*
+         * ==========================================
+         * MENSAGEM
+         * ==========================================
+         */
+
+        message.addEventListener(
+            'input',
+            () => {
+
+                characterCount.textContent =
+                    `${message.value.length} / 4096`
+
+
+                updateSendButton()
+
+            }
+        )
+
+
+        /*
+         * ==========================================
+         * BOTÃO DE ENVIO
+         * ==========================================
+         */
+
+        function updateSendButton() {
+
+            const hasGroups =
+                getSelectedGroups().length > 0
+
+
+            const hasMessage =
+                message.value.trim().length > 0
+
+
+            sendButton.disabled =
+                !hasGroups ||
+                !hasMessage ||
+                !socket.connected
+
+        }
+
+
+        sendButton.addEventListener(
+            'click',
+            () => {
+
+                const selectedGroups =
+                    getSelectedGroups()
+
+
+                const text =
+                    message.value.trim()
+
+
+                console.log(
+                    '[PAINEL] Botão Send message clicado.'
+                )
+
+
+                console.log(
+                    '[PAINEL] Socket conectado:',
+                    socket.connected
+                )
+
+
+                console.log(
+                    '[PAINEL] Grupos selecionados:',
+                    selectedGroups
+                )
+
+
+                console.log(
+                    '[PAINEL] Mensagem:',
+                    text
+                )
+
+            }
+        )
+
+
+        /*
+         * ==========================================
+         * CANCELAR
+         * ==========================================
+         */
+
+        cancelButton.addEventListener(
+            'click',
+            () => {
+
+                console.log(
+                    '[PAINEL] Cancelamento solicitado.'
+                )
+
+            }
+        )
+
+
+        /*
+         * ==========================================
+         * ESTADO INICIAL
+         * ==========================================
+         */
+
+        cooldownStatus.textContent =
+            'Ready'
+
+
+        updateSelection()
+
 
     </script>
 
 </body>
 
 </html>
+
