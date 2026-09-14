@@ -2,225 +2,277 @@
 
 require('dotenv').config()
 
-
 const express =
-    require('express')
-
+require('express')
 
 const http =
-    require('http')
-
+require('http')
 
 const path =
-    require('path')
-
+require('path')
 
 const { Server } =
-    require('socket.io')
-
+require('socket.io')
 
 const initializeSystem =
-    require('./src/startup')
-
+require('./src/startup')
 
 const createWhatsApp =
-    require('./src/whatsapp')
-
+require('./src/whatsapp')
 
 const setupSocket =
-    require('./src/socket')
-
+require('./src/socket')
 
 const setupAuthRoutes =
-    require('./auth/routes')
-
+require('./auth/routes')
 
 const {
-    requireAuth
+requireAuth
 } =
-    require('./src/auth/middleware')
-
+require('./src/auth/middleware')
 
 /*
- * ==========================================
- * INICIALIZAÇÃO
- * ==========================================
- */
+
+* ==========================================
+* INICIALIZAÇÃO DO SISTEMA
+* ==========================================
+  */
 
 initializeSystem()
 
+/*
+
+* ==========================================
+* EXPRESS
+* ==========================================
+  */
 
 const app =
-    express()
-
+express()
 
 const server =
-    http.createServer(
-        app
-    )
+http.createServer(
+app
+)
 
+/*
+
+* ==========================================
+* SOCKET.IO
+* ==========================================
+  */
 
 const io =
-    new Server(
-        server
-    )
+new Server(
+server
+)
 
+/*
+
+* ==========================================
+* PORTA
+* ==========================================
+  */
 
 const PORT =
-    Number(
-        process.env.PORT || 3000
-    )
-
-
-app.use(
-    express.json()
+Number(
+process.env.PORT || 3000
 )
 
+/*
+
+* ==========================================
+* JSON
+* ==========================================
+  */
+
+app.use(
+express.json()
+)
 
 /*
- * ==========================================
- * AUTENTICAÇÃO
- * ==========================================
- */
+
+* ==========================================
+* AUTENTICAÇÃO
+* ==========================================
+*
+* O sistema de login continua
+* exatamente separado do painel.
+  */
 
 const auth =
-    setupAuthRoutes(
-        app
-    )
-
-
-/*
- * ==========================================
- * ARQUIVOS PÚBLICOS
- * ==========================================
- *
- * Login, 404 e página inicial
- * continuam disponíveis.
- */
-
-app.use(
-    express.static(
-        path.join(
-            __dirname,
-            'public'
-        ),
-        {
-            index: false
-        }
-    )
+setupAuthRoutes(
+app
 )
 
-
 /*
- * ==========================================
- * PROTEÇÃO DO PAINEL
- * ==========================================
- */
+
+* ==========================================
+* ARQUIVOS PÚBLICOS
+* ==========================================
+*
+* Mantém:
+*
+* /login
+* /
+* /404
+* /qr.png
+* demais arquivos públicos
+  */
 
 app.use(
-    '/painel',
-    requireAuth(
-        auth
-    )
+express.static(
+path.join(
+__dirname,
+'public'
+),
+{
+index: false
+}
+)
 )
 
+/*
+
+* ==========================================
+* PROTEÇÃO DO PAINEL
+* ==========================================
+*
+* Qualquer endereço começando
+* por /painel passa pela autenticação.
+  */
+
+app.use(
+'/painel',
+requireAuth(
+auth
+)
+)
 
 /*
- * ==========================================
- * PÁGINA DO PAINEL
- * ==========================================
- */
+
+* ==========================================
+* PÁGINA DO PAINEL
+* ==========================================
+  */
 
 app.get(
-    '/painel/',
-    (req, res) => {
+'/painel/',
+(req, res) => {
 
-        res.sendFile(
-            path.join(
-                __dirname,
-                'public',
-                'painel',
-                'index.html'
-            )
+
+    res.sendFile(
+        path.join(
+            __dirname,
+            'public',
+            'painel',
+            'index.html'
         )
+    )
 
-    }
+}
+
+
 )
 
-
 /*
- * ==========================================
- * WHATSAPP
- * ==========================================
- */
+
+* ==========================================
+* WHATSAPP
+* ==========================================
+*
+* O WhatsApp recebe o Socket.IO
+* para poder informar:
+*
+* * QR Code
+* * conexão
+* * desconexão
+* * estado
+    */
 
 const whatsapp =
-    createWhatsApp()
-
+createWhatsApp(
+io
+)
 
 /*
- * ==========================================
- * SOCKET.IO
- * ==========================================
- *
- * O Socket.IO agora fica responsável
- * somente pela comunicação necessária
- * entre navegador e servidor.
- */
+
+* ==========================================
+* SOCKET.IO
+* ==========================================
+*
+* Responsável pela comunicação
+* entre navegador e servidor.
+*
+* Também recebe:
+*
+* start-whatsapp
+*
+* e chama:
+*
+* whatsapp.start()
+  */
 
 setupSocket(
-    io,
-    auth
+io,
+whatsapp,
+auth
 )
 
-
 /*
- * ==========================================
- * 404
- * ==========================================
- *
- * Deve ficar por último.
- */
+
+* ==========================================
+* 404
+* ==========================================
+*
+* Deve permanecer por último.
+  */
 
 app.use(
-    (req, res) => {
+(req, res) => {
 
-        res.status(
-            404
+
+    res.status(
+        404
+    )
+
+
+    res.sendFile(
+        path.join(
+            __dirname,
+            'public',
+            '404',
+            'index.html'
         )
+    )
+
+}
 
 
-        res.sendFile(
-            path.join(
-                __dirname,
-                'public',
-                '404',
-                'index.html'
-            )
-        )
-
-    }
 )
 
-
 /*
- * ==========================================
- * SERVIDOR
- * ==========================================
- */
+
+* ==========================================
+* SERVIDOR
+* ==========================================
+  */
 
 server.listen(
-    PORT,
-    () => {
-
-        console.log(
-            `Painel disponível em http://localhost:${PORT}`
-        )
+PORT,
+() => {
 
 
-        console.log(
-            'WhatsApp aguardando inicialização pelo painel.'
-        )
+    console.log(
+        `Painel disponível em http://localhost:${PORT}`
+    )
 
-    }
+
+    console.log(
+        'WhatsApp aguardando inicialização pelo painel.'
+    )
+
+}
+
+
 )
