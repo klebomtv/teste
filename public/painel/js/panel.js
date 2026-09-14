@@ -1,214 +1,112 @@
-
 // caminho: public/painel/js/panel.js
-
-import {
-    setupGroups
-} from './groups.js'
-
-
-import {
-    setupMessages
-} from './messages.js'
-
 
 const socket =
     io()
 
 
-/*
- * ==========================================
- * ELEMENTOS
- * ==========================================
- */
-
-const connectionStatus =
+const groupSelect =
     document.getElementById(
-        'connection-status'
+        'group'
     )
 
 
-const whatsappStatus =
-    document.getElementById(
-        'whatsapp-status'
-    )
+function renderGroups(
+    groups
+) {
 
-
-const logout =
-    document.getElementById(
-        'logout'
-    )
-
-
-/*
- * ==========================================
- * SOCKET
- * ==========================================
- */
-
-socket.on(
-    'connect',
-    () => {
-
-        if (connectionStatus) {
-
-            connectionStatus.textContent =
-                'Servidor conectado.'
-
-        }
-
+    if (!groupSelect) {
+        return
     }
-)
 
 
-socket.on(
-    'disconnect',
-    () => {
+    groupSelect.innerHTML = ''
 
-        if (connectionStatus) {
 
-            connectionStatus.textContent =
-                'Servidor desconectado.'
+    if (
+        !Array.isArray(groups) ||
+        groups.length === 0
+    ) {
 
-        }
+        const option =
+            document.createElement(
+                'option'
+            )
 
+        option.value = ''
+
+        option.textContent =
+            'Nenhum grupo encontrado'
+
+        groupSelect.appendChild(
+            option
+        )
+
+        return
     }
-)
 
 
-/*
- * ==========================================
- * WHATSAPP
- * ==========================================
- */
+    groups.forEach(
+        group => {
 
-socket.on(
-    'whatsapp-state',
-    state => {
-
-        if (!whatsappStatus) {
-            return
-        }
-
-
-        if (
-            state?.connected
-        ) {
-
-            whatsappStatus.textContent =
-                'WhatsApp conectado.'
-
-            return
-
-        }
-
-
-        if (
-            state?.started
-        ) {
-
-            whatsappStatus.textContent =
-                state.status ||
-                'WhatsApp iniciando.'
-
-            return
-
-        }
-
-
-        whatsappStatus.textContent =
-            'WhatsApp desconectado.'
-
-    }
-)
-
-
-socket.on(
-    'starting-whatsapp',
-    () => {
-
-        if (whatsappStatus) {
-
-            whatsappStatus.textContent =
-                'Iniciando WhatsApp...'
-
-        }
-
-    }
-)
-
-
-socket.on(
-    'connected',
-    connected => {
-
-        if (!whatsappStatus) {
-            return
-        }
-
-
-        whatsappStatus.textContent =
-            connected
-                ? 'WhatsApp conectado.'
-                : 'WhatsApp desconectado.'
-
-    }
-)
-
-
-/*
- * ==========================================
- * MÓDULOS DO PAINEL
- * ==========================================
- */
-
-setupGroups(
-    socket
-)
-
-
-setupMessages(
-    socket
-)
-
-
-/*
- * ==========================================
- * LOGOUT
- * ==========================================
- */
-
-if (logout) {
-
-    logout.addEventListener(
-        'click',
-        async () => {
-
-            try {
-
-                await fetch(
-                    '/auth/logout',
-                    {
-                        method: 'POST',
-                        credentials:
-                            'same-origin'
-                    }
+            const option =
+                document.createElement(
+                    'option'
                 )
 
+            option.value =
+                group.id
 
-                window.location.href =
-                    '/login/'
+            option.textContent =
+                group.name
 
-            } catch (error) {
-
-                console.error(
-                    '[PAINEL] Erro ao sair:',
-                    error
-                )
-
-            }
+            groupSelect.appendChild(
+                option
+            )
 
         }
     )
 
 }
 
+
+socket.on(
+    'groups',
+    groups => {
+
+        console.log(
+            '[PAINEL] Grupos recebidos:',
+            groups
+        )
+
+        renderGroups(
+            groups
+        )
+
+    }
+)
+
+
+socket.on(
+    'whatsapp-state',
+    state => {
+
+        if (
+            state &&
+            Array.isArray(
+                state.groups
+            )
+        ) {
+
+            console.log(
+                '[PAINEL] Grupos recebidos pelo estado:',
+                state.groups
+            )
+
+            renderGroups(
+                state.groups
+            )
+
+        }
+
+    }
+)
