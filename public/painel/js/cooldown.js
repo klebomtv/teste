@@ -1,7 +1,7 @@
-
 // caminho: public/painel/js/cooldown.js
 
 let cooldown = false
+
 let cooldownTimer = null
 
 
@@ -10,12 +10,6 @@ export function startCooldown(
     button
 ) {
 
-    /*
-     * ==========================================
-     * VALIDAÇÃO
-     * ==========================================
-     */
-
     if (!button) {
 
         console.warn(
@@ -23,14 +17,9 @@ export function startCooldown(
         )
 
         return
+
     }
 
-
-    /*
-     * ==========================================
-     * LIMPA COOLDOWN ANTERIOR
-     * ==========================================
-     */
 
     clearInterval(
         cooldownTimer
@@ -61,16 +50,8 @@ export function startCooldown(
 
 
     button.textContent =
-        'Aguarde ' +
-        remaining +
-        's'
+        `Aguarde ${remaining}s`
 
-
-    /*
-     * ==========================================
-     * CONTADOR
-     * ==========================================
-     */
 
     cooldownTimer =
         setInterval(
@@ -87,26 +68,37 @@ export function startCooldown(
                         cooldownTimer
                     )
 
+
                     cooldownTimer =
                         null
+
 
                     cooldown =
                         false
 
+
                     button.disabled =
                         false
+
 
                     button.textContent =
                         'Enviar mensagem'
 
+
+                    document.dispatchEvent(
+                        new CustomEvent(
+                            'cooldown-finished'
+                        )
+                    )
+
+
                     return
+
                 }
 
 
                 button.textContent =
-                    'Aguarde ' +
-                    remaining +
-                    's'
+                    `Aguarde ${remaining}s`
 
             },
             1000
@@ -115,15 +107,8 @@ export function startCooldown(
 }
 
 
-/*
- * ==========================================
- * VERIFICA COOLDOWN
- * ==========================================
- */
-
 export function isCooldown() {
 
     return cooldown
 
 }
-

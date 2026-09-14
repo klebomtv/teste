@@ -1,4 +1,3 @@
-
 <!-- caminho: public/painel/index.html -->
 
 <!DOCTYPE html>
@@ -56,9 +55,19 @@
                     class="connection-dot"
                 ></span>
 
+
                 <span id="connection-status">
                     Connecting...
                 </span>
+
+
+                <button
+                    id="disconnect"
+                    class="button button-secondary"
+                    type="button"
+                >
+                    Disconnect
+                </button>
 
             </div>
 
@@ -68,7 +77,9 @@
         <section class="workspace">
 
 
-            <!-- GROUPS -->
+            <!-- ===================================== -->
+            <!-- GROUPS                                -->
+            <!-- ===================================== -->
 
             <section class="card groups-card">
 
@@ -137,7 +148,9 @@
             </section>
 
 
-            <!-- MESSAGE -->
+            <!-- ===================================== -->
+            <!-- MESSAGE                               -->
+            <!-- ===================================== -->
 
             <section class="card composer-card">
 
@@ -186,7 +199,9 @@
                 </div>
 
 
-                <!-- COOLDOWN -->
+                <!-- ================================= -->
+                <!-- COOLDOWN                           -->
+                <!-- ================================= -->
 
                 <div class="cooldown">
 
@@ -213,7 +228,9 @@
                 </div>
 
 
-                <!-- SEND -->
+                <!-- ================================= -->
+                <!-- SEND                               -->
+                <!-- ================================= -->
 
                 <div class="send-area">
 
@@ -256,7 +273,9 @@
                 </div>
 
 
-                <!-- PROGRESS -->
+                <!-- ================================= -->
+                <!-- PROGRESS                           -->
+                <!-- ================================= -->
 
                 <div
                     id="progress-area"
@@ -269,6 +288,7 @@
                         <span>
                             Sending...
                         </span>
+
 
                         <span id="progress-text">
                             0 / 0
@@ -301,6 +321,10 @@
         </section>
 
 
+        <!-- ========================================= -->
+        <!-- FOOTER                                    -->
+        <!-- ========================================= -->
+
         <footer class="footer">
 
             <span>
@@ -321,648 +345,16 @@
     ></script>
 
 
-    <script>
+    <!-- ========================================= -->
+    <!-- PAINEL                                    -->
+    <!-- ========================================= -->
+
+    <script
+        type="module"
+        src="/painel/js/panel.js"
+    ></script>
 
-        /*
-         * ==========================================
-         * SOCKET.IO
-         * ==========================================
-         */
-
-        const socket =
-            io()
-
-
-        console.log(
-            '[PAINEL] Socket inicializado.'
-        )
-
-
-        /*
-         * ==========================================
-         * ELEMENTOS
-         * ==========================================
-         */
-
-        const connectionStatus =
-            document.getElementById(
-                'connection-status'
-            )
-
-
-        const connectionDot =
-            document.getElementById(
-                'connection-dot'
-            )
-
-
-        const groupsContainer =
-            document.getElementById(
-                'groups'
-            )
-
-
-        const groupCount =
-            document.getElementById(
-                'group-count'
-            )
-
-
-        const selectedCount =
-            document.getElementById(
-                'selected-count'
-            )
-
-
-        const selectAll =
-            document.getElementById(
-                'select-all'
-            )
-
-
-        const message =
-            document.getElementById(
-                'message'
-            )
-
-
-        const characterCount =
-            document.getElementById(
-                'character-count'
-            )
-
-
-        const sendTargetCount =
-            document.getElementById(
-                'send-target-count'
-            )
-
-
-        const sendButton =
-            document.getElementById(
-                'send-message'
-            )
-
-
-        const cancelButton =
-            document.getElementById(
-                'cancel-send'
-            )
-
-
-        const progressArea =
-            document.getElementById(
-                'progress-area'
-            )
-
-
-        const cooldownStatus =
-            document.getElementById(
-                'cooldown-status'
-            )
-
-
-        /*
-         * ==========================================
-         * ESTADO LOCAL
-         * ==========================================
-         */
-
-        let availableGroups =
-            []
-
-
-        /*
-         * ==========================================
-         * STATUS DA CONEXÃO
-         * ==========================================
-         */
-
-        function setConnectionStatus(
-            connected
-        ) {
-
-            if (
-                connected
-            ) {
-
-                connectionStatus.textContent =
-                    'Connected'
-
-                connectionDot.classList.add(
-                    'connected'
-                )
-
-                return
-
-            }
-
-
-            connectionStatus.textContent =
-                'Disconnected'
-
-            connectionDot.classList.remove(
-                'connected'
-            )
-
-        }
-
-
-        /*
-         * ==========================================
-         * SOCKET CONECTADO
-         * ==========================================
-         */
-
-        socket.on(
-            'connect',
-            () => {
-
-                console.log(
-                    '[PAINEL] Socket conectado:',
-                    socket.id
-                )
-
-
-                console.log(
-                    '[PAINEL] Transport:',
-                    socket.io.engine.transport.name
-                )
-
-
-                setConnectionStatus(
-                    true
-                )
-
-            }
-        )
-
-
-        /*
-         * ==========================================
-         * SOCKET DESCONECTADO
-         * ==========================================
-         */
-
-        socket.on(
-            'disconnect',
-            reason => {
-
-                console.error(
-                    '[PAINEL] Socket desconectado:',
-                    reason
-                )
-
-
-                setConnectionStatus(
-                    false
-                )
-
-            }
-        )
-
-
-        /*
-         * ==========================================
-         * ERRO DE CONEXÃO
-         * ==========================================
-         */
-
-        socket.on(
-            'connect_error',
-            error => {
-
-                console.error(
-                    '[PAINEL] Erro de conexão Socket.IO:',
-                    error
-                )
-
-            }
-        )
-
-
-        /*
-         * ==========================================
-         * ENGINE.IO
-         * ==========================================
-         */
-
-        socket.io.engine.on(
-            'close',
-            reason => {
-
-                console.error(
-                    '[PAINEL] Engine.IO close:',
-                    reason
-                )
-
-            }
-        )
-
-
-        socket.io.engine.on(
-            'error',
-            error => {
-
-                console.error(
-                    '[PAINEL] Engine.IO error:',
-                    error
-                )
-
-            }
-        )
-
-
-        /*
-         * ==========================================
-         * AUTENTICAÇÃO
-         * ==========================================
-         */
-
-        socket.on(
-            'auth-error',
-            data => {
-
-                console.error(
-                    '[PAINEL] Erro de autenticação:',
-                    data
-                )
-
-
-                connectionStatus.textContent =
-                    'Authentication error'
-
-            }
-        )
-
-
-        /*
-         * ==========================================
-         * ESTADO DO WHATSAPP
-         * ==========================================
-         */
-
-        socket.on(
-            'whatsapp-state',
-            state => {
-
-                console.log(
-                    '[PAINEL] Estado recebido:',
-                    state
-                )
-
-
-                if (
-                    state &&
-                    Array.isArray(
-                        state.groups
-                    )
-                ) {
-
-                    renderGroups(
-                        state.groups
-                    )
-
-                }
-
-            }
-        )
-
-
-        /*
-         * ==========================================
-         * GRUPOS
-         * ==========================================
-         */
-
-        socket.on(
-            'groups',
-            groups => {
-
-                console.log(
-                    '[PAINEL] Evento groups recebido:',
-                    groups
-                )
-
-
-                renderGroups(
-                    groups
-                )
-
-            }
-        )
-
-
-        function renderGroups(
-            groups
-        ) {
-
-            availableGroups =
-                Array.isArray(groups)
-                    ? groups
-                    : []
-
-
-            groupCount.textContent =
-                availableGroups.length
-
-
-            groupsContainer.innerHTML =
-                ''
-
-
-            if (
-                availableGroups.length === 0
-            ) {
-
-                groupsContainer.innerHTML =
-                    '<div class="loading">No groups found.</div>'
-
-                updateSelection()
-
-                return
-
-            }
-
-
-            availableGroups.forEach(
-                (
-                    group,
-                    index
-                ) => {
-
-                    const label =
-                        document.createElement(
-                            'label'
-                        )
-
-
-                    label.className =
-                        'group-item'
-
-
-                    const checkbox =
-                        document.createElement(
-                            'input'
-                        )
-
-
-                    checkbox.type =
-                        'checkbox'
-
-
-                    checkbox.className =
-                        'group-checkbox'
-
-
-                    checkbox.value =
-                        group.id
-
-
-                    checkbox.dataset.index =
-                        index
-
-
-                    const name =
-                        document.createElement(
-                            'span'
-                        )
-
-
-                    name.textContent =
-                        group.name ||
-                        'Unnamed group'
-
-
-                    label.appendChild(
-                        checkbox
-                    )
-
-
-                    label.appendChild(
-                        name
-                    )
-
-
-                    groupsContainer.appendChild(
-                        label
-                    )
-
-
-                    checkbox.addEventListener(
-                        'change',
-                        updateSelection
-                    )
-
-                }
-            )
-
-
-            updateSelection()
-
-        }
-
-
-        /*
-         * ==========================================
-         * SELEÇÃO DOS GRUPOS
-         * ==========================================
-         */
-
-        function getSelectedGroups() {
-
-            return [
-                ...document.querySelectorAll(
-                    '.group-checkbox:checked'
-                )
-            ]
-            .map(
-                checkbox =>
-                    checkbox.value
-            )
-
-        }
-
-
-        function updateSelection() {
-
-            const selected =
-                getSelectedGroups()
-
-
-            const total =
-                availableGroups.length
-
-
-            selectedCount.textContent =
-                `${selected.length} selected`
-
-
-            sendTargetCount.textContent =
-                `${selected.length} ${
-                    selected.length === 1
-                        ? 'group'
-                        : 'groups'
-                }`
-
-
-            selectAll.checked =
-                total > 0 &&
-                selected.length === total
-
-
-            selectAll.indeterminate =
-                selected.length > 0 &&
-                selected.length < total
-
-
-            updateSendButton()
-
-        }
-
-
-        selectAll.addEventListener(
-            'change',
-            () => {
-
-                const checkboxes =
-                    document.querySelectorAll(
-                        '.group-checkbox'
-                    )
-
-
-                checkboxes.forEach(
-                    checkbox => {
-
-                        checkbox.checked =
-                            selectAll.checked
-
-                    }
-                )
-
-
-                updateSelection()
-
-            }
-        )
-
-
-        /*
-         * ==========================================
-         * MENSAGEM
-         * ==========================================
-         */
-
-        message.addEventListener(
-            'input',
-            () => {
-
-                characterCount.textContent =
-                    `${message.value.length} / 4096`
-
-
-                updateSendButton()
-
-            }
-        )
-
-
-        /*
-         * ==========================================
-         * BOTÃO DE ENVIO
-         * ==========================================
-         */
-
-        function updateSendButton() {
-
-            const hasGroups =
-                getSelectedGroups().length > 0
-
-
-            const hasMessage =
-                message.value.trim().length > 0
-
-
-            sendButton.disabled =
-                !hasGroups ||
-                !hasMessage ||
-                !socket.connected
-
-        }
-
-
-        sendButton.addEventListener(
-            'click',
-            () => {
-
-                const selectedGroups =
-                    getSelectedGroups()
-
-
-                const text =
-                    message.value.trim()
-
-
-                console.log(
-                    '[PAINEL] Botão Send message clicado.'
-                )
-
-
-                console.log(
-                    '[PAINEL] Socket conectado:',
-                    socket.connected
-                )
-
-
-                console.log(
-                    '[PAINEL] Grupos selecionados:',
-                    selectedGroups
-                )
-
-
-                console.log(
-                    '[PAINEL] Mensagem:',
-                    text
-                )
-
-            }
-        )
-
-
-        /*
-         * ==========================================
-         * CANCELAR
-         * ==========================================
-         */
-
-        cancelButton.addEventListener(
-            'click',
-            () => {
-
-                console.log(
-                    '[PAINEL] Cancelamento solicitado.'
-                )
-
-            }
-        )
-
-
-        /*
-         * ==========================================
-         * ESTADO INICIAL
-         * ==========================================
-         */
-
-        cooldownStatus.textContent =
-            'Ready'
-
-
-        updateSelection()
-
-
-    </script>
 
 </body>
 
 </html>
-

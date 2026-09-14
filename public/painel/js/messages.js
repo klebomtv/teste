@@ -1,5 +1,8 @@
-
 // caminho: public/painel/js/messages.js
+
+import {
+    getSelectedGroups
+} from './groups.js'
 
 import {
     startCooldown,
@@ -7,301 +10,692 @@ import {
 } from './cooldown.js'
 
 
-export function setupMessages(
-    socket
+let socket = null
+
+let socketConnected = false
+
+let sending = false
+
+
+const message =
+    document.getElementById(
+        'message'
+    )
+
+
+const characterCount =
+    document.getElementById(
+        'character-count'
+    )
+
+
+const sendButton =
+    document.getElementById(
+        'send-message'
+    )
+
+
+const cancelButton =
+    document.getElementById(
+        'cancel-send'
+    )
+
+
+const progressArea =
+    document.getElementById(
+        'progress-area'
+    )
+
+
+const progressText =
+    document.getElementById(
+        'progress-text'
+    )
+
+
+const progressFill =
+    document.getElementById(
+        'progress-fill'
+    )
+
+
+const sendStatus =
+    document.getElementById(
+        'send-status'
+    )
+
+
+const cooldownStatus =
+    document.getElementById(
+        'cooldown-status'
+    )
+
+
+/*
+ * ==========================================
+ * CONEXÃO
+ * ==========================================
+ */
+
+export function updateMessagesConnection(
+    connected
 ) {
 
-    const groupSelect =
-        document.getElementById(
-            'group'
-        )
+    socketConnected =
+        connected
 
 
-    const messageInput =
-        document.getElementById(
-            'message'
-        )
+    updateSendButton()
+
+}
 
 
-    const sendButton =
-        document.getElementById(
-            'send'
-        )
+/*
+ * ==========================================
+ * ATUALIZAR BOTÃO
+ * ==========================================
+ */
+
+function updateSendButton() {
+
+    if (!sendButton) {
+        return
+    }
 
 
-    const cancelButton =
-        document.getElementById(
-            'cancel-send'
-        )
+    const hasGroups =
+        getSelectedGroups().length > 0
 
 
-    const result =
-        document.getElementById(
-            'result'
-        )
+    const hasMessage =
+        message.value.trim().length > 0
 
 
-    if (
-        !groupSelect ||
-        !messageInput ||
-        !sendButton
-    ) {
+    sendButton.disabled =
+        !hasGroups ||
+        !hasMessage ||
+        !socketConnected ||
+        sending ||
+        isCooldown()
 
-        console.warn(
-            '[MESSAGES] Elementos do formulário não encontrados.'
-        )
+}
+
+
+/*
+ * ==========================================
+ * ALTERAÇÃO NA SELEÇÃO DOS GRUPOS
+ * ==========================================
+ */
+
+document.addEventListener(
+    'groups-selection-changed',
+    () => {
+
+        updateSendButton()
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * CONTADOR DE CARACTERES
+ * ==========================================
+ */
+
+message.addEventListener(
+    'input',
+    () => {
+
+        characterCount.textContent =
+            `${message.value.length} / 4096`
+
+
+        updateSendButton()
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * ENVIAR MENSAGEM
+ * ==========================================
+ */
+
+function sendMessage() {
+
+    console.log(
+        '[MESSAGES] Botão de envio clicado.'
+    )
+
+
+    console.log(
+        '[MESSAGES] Socket conectado:',
+        socketConnected
+    )
+
+
+    const selectedGroups =
+        getSelectedGroups()
+
+
+    const text =
+        message.value.trim()
+
+
+    console.log(
+        '[MESSAGES] Grupos selecionados:',
+        selectedGroups
+    )
+
+
+    console.log(
+        '[MESSAGES] Mensagem:',
+        text
+    )
+
+
+    if (!socketConnected) {
+
+        sendStatus.textContent =
+            'Servidor não conectado.'
 
         return
 
     }
 
 
-    /*
-     * ==========================================
-     * ENVIO
-     * ==========================================
-     */
+    if (isCooldown()) {
 
-    sendButton.addEventListener(
-        'click',
-        () => {
+        sendStatus.textContent =
+            'Aguarde o cooldown.'
 
-            if (
-                isCooldown()
-            ) {
-
-                return
-
-            }
-
-
-            const target =
-                groupSelect.value
-
-
-            const text =
-                messageInput.value.trim()
-
-
-            if (!target) {
-
-                result.textContent =
-                    'Selecione um grupo.'
-
-                return
-
-            }
-
-
-            if (!text) {
-
-                result.textContent =
-                    'Digite uma mensagem.'
-
-                return
-
-            }
-
-
-            sendButton.disabled =
-                true
-
-
-            result.textContent =
-                'Enviando...'
-
-
-            socket.emit(
-                'send-message',
-                {
-                    target,
-                    message:
-                        text
-                }
-            )
-
-        }
-    )
-
-
-    /*
-     * ==========================================
-     * CANCELAR ENVIO EM MASSA
-     * ==========================================
-     */
-
-    if (cancelButton) {
-
-        cancelButton.addEventListener(
-            'click',
-            () => {
-
-                socket.emit(
-                    'cancel-send'
-                )
-
-            }
-        )
+        return
 
     }
 
 
-    /*
-     * ==========================================
-     * RESULTADO
-     * ==========================================
-     */
+    if (!selectedGroups.length) {
 
-    socket.on(
-        'send-result',
-        data => {
+        sendStatus.textContent =
+            'Selecione pelo menos um grupo.'
 
-            sendButton.disabled =
-                false
+        return
+
+    }
 
 
-            if (
-                data &&
-                data.success
-            ) {
+    if (!text) {
 
-                result.textContent =
-                    data.message ||
-                    'Mensagem enviada.'
+        sendStatus.textContent =
+            'Digite uma mensagem.'
 
-                startCooldown(
-                    data.cooldown ||
-                    5,
-                    sendButton
-                )
+        return
 
-                return
-
-            }
+    }
 
 
-            result.textContent =
-                data?.message ||
-                'Não foi possível enviar a mensagem.'
-
-        }
-    )
+    sending =
+        true
 
 
-    /*
-     * ==========================================
-     * ENVIO INICIADO
-     * ==========================================
-     */
-
-    socket.on(
-        'send-started',
-        data => {
-
-            if (!result) {
-                return
-            }
+    updateSendButton()
 
 
-            result.textContent =
-                `Enviando para ${data.total} grupos...`
+    cancelButton.hidden =
+        false
 
 
-            if (cancelButton) {
-
-                cancelButton.disabled =
-                    false
-
-            }
-
-        }
-    )
+    cancelButton.disabled =
+        false
 
 
-    /*
-     * ==========================================
-     * PROGRESSO
-     * ==========================================
-     */
-
-    socket.on(
-        'send-progress',
-        data => {
-
-            if (!result) {
-                return
-            }
+    progressArea.hidden =
+        false
 
 
-            result.textContent =
-                `Enviando ${data.current}/${data.total} — ${data.group}`
-
-        }
-    )
+    progressText.textContent =
+        `0 / ${selectedGroups.length}`
 
 
-    /*
-     * ==========================================
-     * ENVIO FINALIZADO
-     * ==========================================
-     */
-
-    socket.on(
-        'send-finished',
-        data => {
-
-            sendButton.disabled =
-                false
+    progressFill.style.width =
+        '0%'
 
 
-            if (cancelButton) {
-
-                cancelButton.disabled =
-                    true
-
-            }
+    sendStatus.textContent =
+        'Preparando envio...'
 
 
-            result.textContent =
-                `Envio concluído. Enviadas: ${data.sent}. Falhas: ${data.failed}.`
+    cooldownStatus.textContent =
+        'Sending'
 
 
-            startCooldown(
-                5,
-                sendButton
-            )
+    socket.emit(
+        'send-message',
+        {
+            groupIds:
+                selectedGroups,
 
-        }
-    )
-
-
-    /*
-     * ==========================================
-     * ENVIO CANCELADO
-     * ==========================================
-     */
-
-    socket.on(
-        'send-cancelled',
-        data => {
-
-            sendButton.disabled =
-                false
-
-
-            if (cancelButton) {
-
-                cancelButton.disabled =
-                    true
-
-            }
-
-
-            result.textContent =
-                `Envio cancelado. Enviadas: ${data.sent}. Falhas: ${data.failed}.`
-
+            message:
+                text
         }
     )
 
 }
 
+
+/*
+ * ==========================================
+ * BOTÃO ENVIAR
+ * ==========================================
+ */
+
+sendButton.addEventListener(
+    'click',
+    sendMessage
+)
+
+
+/*
+ * ==========================================
+ * CANCELAR
+ * ==========================================
+ */
+
+cancelButton.addEventListener(
+    'click',
+    () => {
+
+        console.log(
+            '[MESSAGES] Cancelamento solicitado.'
+        )
+
+
+        socket.emit(
+            'cancel-send'
+        )
+
+
+        sendStatus.textContent =
+            'Cancelamento solicitado...'
+
+
+        cancelButton.disabled =
+            true
+
+    }
+)
+
+
+/*
+ * ==========================================
+ * ENVIO INICIADO
+ * ==========================================
+ */
+
+function handleSendStarted(
+    data
+) {
+
+    console.log(
+        '[MESSAGES] Envio iniciado:',
+        data
+    )
+
+
+    sending =
+        true
+
+
+    updateSendButton()
+
+
+    cancelButton.hidden =
+        false
+
+
+    cancelButton.disabled =
+        false
+
+
+    progressArea.hidden =
+        false
+
+
+    const total =
+        Number(
+            data?.total || 0
+        )
+
+
+    progressText.textContent =
+        `0 / ${total}`
+
+
+    progressFill.style.width =
+        '0%'
+
+
+    sendStatus.textContent =
+        `Enviando para ${total} grupos...`
+
+}
+
+
+/*
+ * ==========================================
+ * PROGRESSO
+ * ==========================================
+ */
+
+function handleSendProgress(
+    data
+) {
+
+    console.log(
+        '[MESSAGES] Progresso:',
+        data
+    )
+
+
+    const current =
+        Number(
+            data?.current || 0
+        )
+
+
+    const total =
+        Number(
+            data?.total || 0
+        )
+
+
+    const percent =
+        total > 0
+            ? (current / total) * 100
+            : 0
+
+
+    progressText.textContent =
+        `${current} / ${total}`
+
+
+    progressFill.style.width =
+        `${percent}%`
+
+
+    sendStatus.textContent =
+        `Enviando: ${
+            data?.group || ''
+        }`
+
+}
+
+
+/*
+ * ==========================================
+ * ENVIO FINALIZADO
+ * ==========================================
+ */
+
+function handleSendFinished(
+    data
+) {
+
+    console.log(
+        '[MESSAGES] Envio finalizado:',
+        data
+    )
+
+
+    sending =
+        false
+
+
+    cancelButton.hidden =
+        true
+
+
+    cancelButton.disabled =
+        true
+
+
+    const sent =
+        Number(
+            data?.sent || 0
+        )
+
+
+    const failed =
+        Number(
+            data?.failed || 0
+        )
+
+
+    const total =
+        Number(
+            data?.total ||
+            sent + failed
+        )
+
+
+    progressFill.style.width =
+        '100%'
+
+
+    progressText.textContent =
+        `${sent} / ${total}`
+
+
+    sendStatus.textContent =
+        `Envio concluído. Enviadas: ${sent}. Falhas: ${failed}.`
+
+
+    cooldownStatus.textContent =
+        'Cooldown'
+
+
+    startCooldown(
+        5,
+        sendButton
+    )
+
+
+    setTimeout(
+        () => {
+
+            cooldownStatus.textContent =
+                'Ready'
+
+
+            updateSendButton()
+
+        },
+        5000
+    )
+
+}
+
+
+/*
+ * ==========================================
+ * ENVIO CANCELADO
+ * ==========================================
+ */
+
+function handleSendCancelled(
+    data
+) {
+
+    console.log(
+        '[MESSAGES] Envio cancelado:',
+        data
+    )
+
+
+    sending =
+        false
+
+
+    cancelButton.hidden =
+        true
+
+
+    cancelButton.disabled =
+        true
+
+
+    sendStatus.textContent =
+        `Envio cancelado. Enviadas: ${
+            data?.sent || 0
+        }. Falhas: ${
+            data?.failed || 0
+        }.`
+
+
+    cooldownStatus.textContent =
+        'Ready'
+
+
+    updateSendButton()
+
+}
+
+
+/*
+ * ==========================================
+ * RESULTADO DO ENVIO
+ * ==========================================
+ */
+
+function handleSendResult(
+    data
+) {
+
+    console.log(
+        '[MESSAGES] Resultado do envio:',
+        data
+    )
+
+
+    if (data?.success) {
+        return
+    }
+
+
+    sending =
+        false
+
+
+    cancelButton.hidden =
+        true
+
+
+    cancelButton.disabled =
+        true
+
+
+    sendStatus.textContent =
+        data?.message ||
+        'Não foi possível enviar a mensagem.'
+
+
+    cooldownStatus.textContent =
+        'Ready'
+
+
+    updateSendButton()
+
+}
+
+
+/*
+ * ==========================================
+ * RESULTADO DO CANCELAMENTO
+ * ==========================================
+ */
+
+function handleCancelResult(
+    data
+) {
+
+    console.log(
+        '[MESSAGES] Resultado do cancelamento:',
+        data
+    )
+
+
+    if (data?.success) {
+
+        sendStatus.textContent =
+            'Cancelamento solicitado.'
+
+    } else {
+
+        sendStatus.textContent =
+            data?.message ||
+            'Nenhum envio em andamento.'
+
+    }
+
+}
+
+
+/*
+ * ==========================================
+ * CONFIGURAR MÓDULO
+ * ==========================================
+ */
+
+export function setupMessages(
+    socketInstance
+) {
+
+    socket =
+        socketInstance
+
+
+    socket.on(
+        'send-started',
+        handleSendStarted
+    )
+
+
+    socket.on(
+        'send-progress',
+        handleSendProgress
+    )
+
+
+    socket.on(
+        'send-finished',
+        handleSendFinished
+    )
+
+
+    socket.on(
+        'send-cancelled',
+        handleSendCancelled
+    )
+
+
+    socket.on(
+        'send-result',
+        handleSendResult
+    )
+
+
+    socket.on(
+        'cancel-result',
+        handleCancelResult
+    )
+
+
+    cooldownStatus.textContent =
+        'Ready'
+
+
+    updateSendButton()
+
+}
