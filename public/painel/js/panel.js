@@ -1,7 +1,7 @@
 
 // caminho: public/painel/js/panel.js
 
-const socket =
+const panelSocket =
     window.panelSocket
 
 
@@ -18,7 +18,7 @@ const panelStatus =
  */
 
 if (
-    !socket
+    !panelSocket
 ) {
 
     console.error(
@@ -34,7 +34,7 @@ if (
      * ==========================================
      */
 
-    socket.on(
+    panelSocket.on(
         'connect',
         () => {
 
@@ -48,7 +48,7 @@ if (
             )
 
 
-            socket.emit(
+            panelSocket.emit(
                 'request-groups'
             )
 
@@ -62,7 +62,7 @@ if (
      * ==========================================
      */
 
-    socket.on(
+    panelSocket.on(
         'whatsapp-state',
         state => {
 
@@ -120,7 +120,7 @@ if (
      * ==========================================
      */
 
-    socket.on(
+    panelSocket.on(
         'groups',
         groups => {
 
@@ -163,9 +163,9 @@ if (
      * ==========================================
      * STATUS WHATSAPP
      * ==========================================
-     */
+ */
 
-    socket.on(
+    panelSocket.on(
         'connected',
         connected => {
 
