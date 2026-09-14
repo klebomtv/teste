@@ -1,4 +1,3 @@
-
 // caminho: src/whatsapp/connection.js
 
 const {
@@ -8,12 +7,10 @@ const {
         '@whiskeysockets/baileys'
     )
 
-
 const pino =
     require(
         'pino'
     )
-
 
 const logger =
     pino(
@@ -23,7 +20,6 @@ const logger =
         }
     )
 
-
 function createConnection(
     auth
 ) {
@@ -31,7 +27,6 @@ function createConnection(
     console.log(
         '[WHATSAPP CONNECTION] Criando conexão Baileys.'
     )
-
 
     const sock =
         makeWASocket({
@@ -43,18 +38,13 @@ function createConnection(
                 false,
 
             logger:
-
                 logger
 
         })
 
-
     return sock
-
 }
-
 
 module.exports = {
     createConnection
 }
-
