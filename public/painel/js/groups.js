@@ -1,89 +1,43 @@
+// caminho: src/whatsapp/groups.js
 
-// caminho: public/painel/js/groups.js
+async function loadGroups(sock) {
 
-export function setupGroups(
-    socket
-) {
+    if (!sock) {
 
-    const groupSelect =
-        document.getElementById(
-            'group'
+        throw new Error(
+            'Socket do WhatsApp não disponível.'
         )
-
-
-    if (!groupSelect) {
-
-        console.warn(
-            '[GROUPS] Elemento #group não encontrado.'
-        )
-
-        return
 
     }
 
 
-    socket.on(
-        'groups',
-        groups => {
-
-            groupSelect.innerHTML = ''
+    const participating =
+        await sock.groupFetchAllParticipating()
 
 
-            const defaultOption =
-                document.createElement(
-                    'option'
-                )
+    const groups =
+        Object.values(
+            participating || {}
+        )
+        .map(
+            group => ({
+
+                id:
+                    group.id,
+
+                name:
+                    group.subject ||
+                    'Grupo sem nome'
+
+            })
+        )
 
 
-            defaultOption.value =
-                ''
-
-            defaultOption.textContent =
-                'Selecione um grupo'
-
-
-            groupSelect.appendChild(
-                defaultOption
-            )
-
-
-            if (
-                !Array.isArray(groups) ||
-                groups.length === 0
-            ) {
-
-                return
-
-            }
-
-
-            groups.forEach(
-                group => {
-
-                    const option =
-                        document.createElement(
-                            'option'
-                        )
-
-
-                    option.value =
-                        group.id
-
-
-                    option.textContent =
-                        group.name ||
-                        'Grupo sem nome'
-
-
-                    groupSelect.appendChild(
-                        option
-                    )
-
-                }
-            )
-
-        }
-    )
+    return groups
 
 }
 
+
+module.exports = {
+    loadGroups
+}
