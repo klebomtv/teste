@@ -1,7 +1,7 @@
+```html
 <!-- caminho: public/painel/index.html -->
 
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 
 <head>
@@ -13,24 +13,58 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Grupos</title>
+    <title>Painel WhatsApp</title>
+
+    <link
+        rel="stylesheet"
+        href="/painel/style.css"
+    >
 
 </head>
 
 <body>
 
-    <h1>
-        Grupos
-    </h1>
+    <main class="painel">
 
-    <div id="groups">
-        Carregando grupos...
-    </div>
+        <header class="painel-header">
+
+            <div>
+
+                <h1>Grupos</h1>
+
+                <p>
+                    Grupos disponíveis no WhatsApp
+                </p>
+
+            </div>
+
+            <div
+                id="group-count"
+                class="group-count"
+            >
+                0 grupos
+            </div>
+
+        </header>
 
 
-    <script
-        src="/socket.io/socket.io.js"
-    ></script>
+        <section class="groups-section">
+
+            <div
+                id="groups"
+                class="groups-list"
+            >
+                <div class="loading">
+                    Carregando grupos...
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="/socket.io/socket.io.js"></script>
 
 
     <script>
@@ -45,12 +79,16 @@
             )
 
 
-        function showGroups(
-            groups
-        ) {
+        const groupCount =
+            document.getElementById(
+                'group-count'
+            )
+
+
+        function showGroups(groups) {
 
             console.log(
-                '[TESTE] Grupos recebidos:',
+                '[PAINEL] Grupos recebidos:',
                 groups
             )
 
@@ -61,17 +99,30 @@
             ) {
 
                 groupsContainer.innerHTML =
-                    '<p>Nenhum grupo encontrado.</p>'
+                    `
+                    <div class="empty">
+                        Nenhum grupo encontrado.
+                    </div>
+                    `
+
+                groupCount.textContent =
+                    '0 grupos'
 
                 return
+
             }
 
 
-            groupsContainer.innerHTML = ''
+            groupsContainer.innerHTML =
+                ''
+
+
+            groupCount.textContent =
+                `${groups.length} grupos`
 
 
             groups.forEach(
-                group => {
+                (group, index) => {
 
                     const item =
                         document.createElement(
@@ -79,12 +130,26 @@
                         )
 
 
-                    item.textContent =
-                        group.name
+                    item.className =
+                        'group-item'
 
 
                     item.dataset.id =
                         group.id
+
+
+                    item.innerHTML =
+                        `
+                        <span class="group-number">
+                            ${index + 1}
+                        </span>
+
+                        <span class="group-name">
+                            ${escapeHTML(
+                                group.name
+                            )}
+                        </span>
+                        `
 
 
                     groupsContainer.appendChild(
@@ -97,12 +162,27 @@
         }
 
 
+        function escapeHTML(text) {
+
+            const element =
+                document.createElement(
+                    'div'
+                )
+
+            element.textContent =
+                text || 'Grupo sem nome'
+
+            return element.innerHTML
+
+        }
+
+
         socket.on(
             'connect',
             () => {
 
                 console.log(
-                    '[TESTE] Socket conectado:',
+                    '[PAINEL] Socket conectado:',
                     socket.id
                 )
 
@@ -115,7 +195,7 @@
             () => {
 
                 console.log(
-                    '[TESTE] Socket desconectado.'
+                    '[PAINEL] Socket desconectado.'
                 )
 
             }
@@ -125,10 +205,6 @@
         socket.on(
             'groups',
             groups => {
-
-                console.log(
-                    '[TESTE] Evento groups recebido.'
-                )
 
                 showGroups(
                     groups
@@ -143,7 +219,7 @@
             state => {
 
                 console.log(
-                    '[TESTE] Estado recebido:',
+                    '[PAINEL] Estado recebido:',
                     state
                 )
 
@@ -170,13 +246,17 @@
             data => {
 
                 console.error(
-                    '[TESTE] Erro de autenticação:',
+                    '[PAINEL] Erro de autenticação:',
                     data
                 )
 
 
                 groupsContainer.innerHTML =
-                    '<p>Sessão não autenticada.</p>'
+                    `
+                    <div class="error">
+                        Sessão não autenticada.
+                    </div>
+                    `
 
             }
         )
@@ -186,3 +266,4 @@
 </body>
 
 </html>
+```
