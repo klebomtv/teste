@@ -1,4 +1,3 @@
-
 // caminho: src/socket.js
 
 function setupSocket(
@@ -11,41 +10,72 @@ function setupSocket(
         '[SOCKET SERVER] Configurando Socket.IO...'
     )
 
+
     io.on(
         'connection',
-        (socket) => {
+        socket => {
 
             console.log(
                 '[SOCKET SERVER] Cliente Socket.IO conectado.'
             )
 
-            /*
-             * ==========================================
-             * AUTENTICAÇÃO DO SOCKET
-             * ==========================================
-             */
+            console.log(
+                '[SOCKET SERVER] Socket ID:',
+                socket.id
+            )
+
+            console.log(
+                '[SOCKET SERVER] Transport:',
+                socket.conn.transport.name
+            )
+
+
+            socket.conn.on(
+                'upgrade',
+                () => {
+
+                    console.log(
+                        '[SOCKET SERVER] Transport atualizado para:',
+                        socket.conn.transport.name
+                    )
+
+                }
+            )
+
 
             const cookies =
                 socket.handshake.headers.cookie || ''
+
 
             const sessionMatch =
                 cookies.match(
                     /(?:^|;\s*)session=([^;]+)/
                 )
 
+
             const sessionId =
                 sessionMatch
                     ? sessionMatch[1]
                     : null
 
+
+            console.log(
+                '[SOCKET SERVER] Session encontrada:',
+                Boolean(sessionId)
+            )
+
+
             if (
                 !sessionId ||
-                !auth.isSessionValid(sessionId)
+                !auth.isSessionValid(
+                    sessionId
+                )
             ) {
 
                 console.log(
                     '[SOCKET SERVER] Socket não autenticado.'
                 )
+
 
                 socket.emit(
                     'auth-error',
@@ -55,27 +85,24 @@ function setupSocket(
                     }
                 )
 
+
                 socket.disconnect()
 
                 return
+
             }
 
-            /*
-             * ==========================================
-             * ESTADO INICIAL DO WHATSAPP
-             * ==========================================
-             */
+
+            console.log(
+                '[SOCKET SERVER] Socket autenticado.'
+            )
+
 
             socket.emit(
                 'whatsapp-state',
                 whatsapp.getState()
             )
 
-            /*
-             * ==========================================
-             * INICIAR WHATSAPP
-             * ==========================================
-             */
 
             socket.on(
                 'start-whatsapp',
@@ -85,13 +112,16 @@ function setupSocket(
                         '[SOCKET SERVER] start-whatsapp recebido.'
                     )
 
+
                     try {
 
                         socket.emit(
                             'starting-whatsapp'
                         )
 
+
                         await whatsapp.start()
+
 
                         socket.emit(
                             'start-result',
@@ -100,12 +130,16 @@ function setupSocket(
                             }
                         )
 
-                    } catch (error) {
+
+                    } catch (
+                        error
+                    ) {
 
                         console.error(
                             '[SOCKET SERVER] Erro ao iniciar WhatsApp:',
                             error
                         )
+
 
                         socket.emit(
                             'start-result',
@@ -122,18 +156,52 @@ function setupSocket(
                 }
             )
 
-            /*
-             * ==========================================
-             * DESCONECTAR
-             * ==========================================
-             */
 
             socket.on(
                 'disconnect',
-                () => {
+                (
+                    reason,
+                    details
+                ) => {
 
                     console.log(
-                        '[SOCKET SERVER] Cliente Socket.IO desconectado.'
+                        '======================================'
+                    )
+
+                    console.log(
+                        '[SOCKET SERVER] CLIENTE DESCONECTADO'
+                    )
+
+                    console.log(
+                        '[SOCKET SERVER] Socket ID:',
+                        socket.id
+                    )
+
+                    console.log(
+                        '[SOCKET SERVER] Motivo:',
+                        reason
+                    )
+
+                    console.log(
+                        '[SOCKET SERVER] Detalhes:',
+                        details
+                    )
+
+                    console.log(
+                        '======================================'
+                    )
+
+                }
+            )
+
+
+            socket.on(
+                'disconnect_error',
+                error => {
+
+                    console.error(
+                        '[SOCKET SERVER] Erro de desconexão:',
+                        error
                     )
 
                 }
@@ -141,6 +209,7 @@ function setupSocket(
 
         }
     )
+
 
     console.log(
         '[SOCKET SERVER] Socket.IO configurado.'
@@ -151,4 +220,3 @@ function setupSocket(
 
 module.exports =
     setupSocket
-
