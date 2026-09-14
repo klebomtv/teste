@@ -2,7 +2,7 @@
 // caminho: public/painel/js/panel.js
 
 const socket =
-    io()
+    window.panelSocket
 
 
 const panelStatus =
@@ -13,156 +13,185 @@ const panelStatus =
 
 /*
  * ==========================================
- * SOCKET CONECTADO
+ * VALIDAR SOCKET
  * ==========================================
  */
 
-socket.on(
-    'connect',
-    () => {
+if (
+    !socket
+) {
 
-        console.log(
-            '[PAINEL] Socket conectado.'
-        )
+    console.error(
+        '[PAINEL] Socket do painel não encontrado.'
+    )
 
-
-        console.log(
-            '[PAINEL] Solicitando grupos.'
-        )
+} else {
 
 
-        socket.emit(
-            'request-groups'
-        )
+    /*
+     * ==========================================
+     * SOCKET CONECTADO
+     * ==========================================
+     */
 
-    }
-)
-
-
-/*
- * ==========================================
- * ESTADO DO WHATSAPP
- * ==========================================
- */
-
-socket.on(
-    'whatsapp-state',
-    state => {
-
-        console.log(
-            '[PAINEL] Estado recebido:',
-            state
-        )
-
-
-        if (
-            !state
-        ) {
-
-            return
-
-        }
-
-
-        if (
-            panelStatus &&
-            state.status
-        ) {
-
-            panelStatus.textContent =
-                state.status
-
-        }
-
-
-        if (
-            Array.isArray(
-                state.groups
-            )
-        ) {
+    socket.on(
+        'connect',
+        () => {
 
             console.log(
-                '[PAINEL] Grupos no estado:',
-                state.groups.length
+                '[PAINEL] Socket conectado.'
+            )
+
+
+            console.log(
+                '[PAINEL] Solicitando grupos.'
+            )
+
+
+            socket.emit(
+                'request-groups'
+            )
+
+        }
+    )
+
+
+    /*
+     * ==========================================
+     * ESTADO DO WHATSAPP
+     * ==========================================
+     */
+
+    socket.on(
+        'whatsapp-state',
+        state => {
+
+            console.log(
+                '[PAINEL] Estado recebido:',
+                state
+            )
+
+
+            if (
+                !state
+            ) {
+
+                return
+
+            }
+
+
+            if (
+                panelStatus &&
+                state.status
+            ) {
+
+                panelStatus.textContent =
+                    state.status
+
+            }
+
+
+            if (
+                Array.isArray(
+                    state.groups
+                )
+            ) {
+
+                console.log(
+                    '[PAINEL] Grupos no estado:',
+                    state.groups.length
+                )
+
+
+                panelGroups.set(
+                    state.groups
+                )
+
+            }
+
+        }
+    )
+
+
+    /*
+     * ==========================================
+     * RECEBER GRUPOS
+     * ==========================================
+     */
+
+    socket.on(
+        'groups',
+        groups => {
+
+            console.log(
+                '[PAINEL] Grupos recebidos:',
+                groups
+            )
+
+
+            if (
+                !Array.isArray(
+                    groups
+                )
+            ) {
+
+                console.error(
+                    '[PAINEL] Grupos recebidos não são um array.'
+                )
+
+                return
+
+            }
+
+
+            console.log(
+                '[PAINEL] Total de grupos recebidos:',
+                groups.length
             )
 
 
             panelGroups.set(
-                state.groups
-            )
-
-        }
-
-    }
-)
-
-
-/*
- * ==========================================
- * RECEBER GRUPOS
- * ==========================================
- */
-
-socket.on(
-    'groups',
-    groups => {
-
-        console.log(
-            '[PAINEL] Grupos recebidos:',
-            groups
-        )
-
-
-        if (
-            !Array.isArray(
                 groups
             )
-        ) {
-
-            return
 
         }
+    )
 
 
-        panelGroups.set(
-            groups
-        )
+    /*
+     * ==========================================
+     * STATUS WHATSAPP
+     * ==========================================
+     */
 
-    }
-)
+    socket.on(
+        'connected',
+        connected => {
 
-
-/*
- * ==========================================
- * STATUS WHATSAPP
- * ==========================================
- */
-
-socket.on(
-    'connected',
-    connected => {
-
-        console.log(
-            '[PAINEL] WhatsApp:',
-            connected
-                ? 'conectado'
-                : 'desconectado'
-        )
-
-
-        if (
-            panelStatus
-        ) {
-
-            panelStatus.textContent =
+            console.log(
+                '[PAINEL] WhatsApp:',
                 connected
-                    ? 'WhatsApp conectado.'
-                    : 'WhatsApp desconectado.'
+                    ? 'conectado'
+                    : 'desconectado'
+            )
+
+
+            if (
+                panelStatus
+            ) {
+
+                panelStatus.textContent =
+                    connected
+                        ? 'WhatsApp conectado.'
+                        : 'WhatsApp desconectado.'
+
+            }
 
         }
+    )
 
-    }
-)
+}
 
 
 console.log(

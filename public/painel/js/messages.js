@@ -5,15 +5,21 @@ const socket =
     io()
 
 
+window.panelSocket =
+    socket
+
+
 const messageInput =
     document.getElementById(
         'message'
     )
 
+
 const sendButton =
     document.getElementById(
         'send-message'
     )
+
 
 const sendStatus =
     document.getElementById(
@@ -112,9 +118,11 @@ function sendMessage() {
         'send-message',
         {
             message,
+
             groups:
                 selectedGroups.map(
-                    group => group.id
+                    group =>
+                        group.id
                 )
         }
     )
@@ -243,4 +251,9 @@ window.panelMessages = {
         () => sending
 
 }
+
+
+console.log(
+    '[PAINEL MESSAGES] Módulo de mensagens carregado.'
+)
 
