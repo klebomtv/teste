@@ -1,4 +1,3 @@
-
 // caminho: src/whatsapp/index.js
 
 const state =
@@ -22,7 +21,7 @@ const groups =
 
 
 const messages =
-    require('./messages')
+    require('./message')
 
 
 const QR_TIMEOUT =
@@ -47,9 +46,7 @@ function createWhatsApp(
 
             qrTimeout =
                 null
-
         }
-
     }
 
 
@@ -59,11 +56,9 @@ function createWhatsApp(
 
         clearQRTimeout()
 
-
         console.log(
             '[WHATSAPP] Tempo para conexão: 60 segundos.'
         )
-
 
         qrTimeout =
             setTimeout(
@@ -79,7 +74,6 @@ function createWhatsApp(
                     ) {
 
                         return
-
                     }
 
 
@@ -88,7 +82,6 @@ function createWhatsApp(
                         if (sock) {
 
                             sock.ws?.close()
-
                         }
 
                     } catch (error) {
@@ -97,7 +90,6 @@ function createWhatsApp(
                             '[WHATSAPP] Erro ao encerrar conexão expirada:',
                             error
                         )
-
                     }
 
 
@@ -117,7 +109,6 @@ function createWhatsApp(
                 },
                 QR_TIMEOUT
             )
-
     }
 
 
@@ -133,7 +124,6 @@ function createWhatsApp(
         ) {
 
             return []
-
         }
 
 
@@ -194,9 +184,7 @@ function createWhatsApp(
 
 
             return []
-
         }
-
     }
 
 
@@ -218,9 +206,7 @@ function createWhatsApp(
 
                 message:
                     'WhatsApp já foi iniciado.'
-
             }
-
         }
 
 
@@ -256,203 +242,314 @@ function createWhatsApp(
                 await auth.loadAuth()
 
 
-            const sock =
-                connection.createConnection(
-                    authState
+            /*
+             * Cria o socket.
+             *
+             * Essa função fica separada porque o Baileys
+             * pode solicitar um restart através do código 515.
+             */
+
+            async function createSocket() {
+
+                console.log(
+                    '[WHATSAPP] Criando socket WhatsApp.'
                 )
 
 
-            state.setSocket(
-                sock
-            )
+                const sock =
+                    connection.createConnection(
+                        authState
+                    )
 
 
-            sock.ev.on(
-                'creds.update',
-                authState.saveCreds
-            )
+                state.setSocket(
+                    sock
+                )
 
 
-            startQRTimeout(
-                sock
-            )
+                sock.ev.on(
+                    'creds.update',
+                    authState.saveCreds
+                )
 
 
-            sock.ev.on(
-                'connection.update',
-                async update => {
-
-                    const {
-
-                        connection:
-                            connectionState,
-
-                        qr:
-                            qrCode
-
-                    } =
-                        update
+                startQRTimeout(
+                    sock
+                )
 
 
-                    /*
-                     * ==================================
-                     * QR CODE
-                     * ==================================
-                     */
+                sock.ev.on(
+                    'connection.update',
+                    async update => {
 
-                    if (
-                        qrCode
-                    ) {
+                        const {
 
-                        console.log(
-                            '[WHATSAPP] QR Code recebido.'
-                        )
+                            connection:
+                                connectionState,
 
+                            qr:
+                                qrCode,
 
-                        state.setQR(
-                            true
-                        )
+                            lastDisconnect
 
-
-                        state.setStatus(
-                            'Aguardando leitura do QR Code...'
-                        )
-
-
-                        await qr.generateQR(
-                            qrCode
-                        )
-
-
-                        io?.emit(
-                            'qr-updated'
-                        )
-
-
-                        io?.emit(
-                            'whatsapp-state',
-                            state.getState()
-                        )
-
-                    }
-
-
-                    /*
-                     * ==================================
-                     * CONECTADO
-                     * ==================================
-                     */
-
-                    if (
-                        connectionState ===
-                        'open'
-                    ) {
-
-                        console.log(
-                            '[WHATSAPP] WhatsApp conectado!'
-                        )
-
-
-                        clearQRTimeout()
-
-
-                        state.setConnected(
-                            true
-                        )
-
-
-                        state.setQR(
-                            false
-                        )
-
-
-                        state.setStatus(
-                            'WhatsApp conectado.'
-                        )
-
-
-                        io?.emit(
-                            'connected',
-                            true
-                        )
-
-
-                        io?.emit(
-                            'whatsapp-state',
-                            state.getState()
-                        )
+                        } =
+                            update
 
 
                         /*
-                         * Carrega os grupos
-                         * depois da conexão.
+                         * ==================================
+                         * QR CODE
+                         * ==================================
                          */
 
-                        await loadGroups()
+                        if (
+                            qrCode
+                        ) {
+
+                            console.log(
+                                '[WHATSAPP] QR Code recebido.'
+                            )
+
+
+                            state.setQR(
+                                true
+                            )
+
+
+                            state.setStatus(
+                                'Aguardando leitura do QR Code...'
+                            )
+
+
+                            await qr.generateQR(
+                                qrCode
+                            )
+
+
+                            io?.emit(
+                                'qr-updated'
+                            )
+
+
+                            io?.emit(
+                                'whatsapp-state',
+                                state.getState()
+                            )
+                        }
+
+
+                        /*
+                         * ==================================
+                         * CONECTADO
+                         * ==================================
+                         */
+
+                        if (
+                            connectionState ===
+                            'open'
+                        ) {
+
+                            console.log(
+                                '[WHATSAPP] WhatsApp conectado!'
+                            )
+
+
+                            clearQRTimeout()
+
+
+                            state.setConnected(
+                                true
+                            )
+
+
+                            state.setQR(
+                                false
+                            )
+
+
+                            state.setStatus(
+                                'WhatsApp conectado.'
+                            )
+
+
+                            io?.emit(
+                                'connected',
+                                true
+                            )
+
+
+                            io?.emit(
+                                'whatsapp-state',
+                                state.getState()
+                            )
+
+
+                            /*
+                             * Carrega os grupos
+                             * depois da conexão.
+                             */
+
+                            await loadGroups()
+                        }
+
+
+                        /*
+                         * ==================================
+                         * DESCONECTADO
+                         * ==================================
+                         */
+
+                        if (
+                            connectionState ===
+                            'close'
+                        ) {
+
+                            const statusCode =
+                                lastDisconnect
+                                    ?.error
+                                    ?.output
+                                    ?.statusCode
+
+
+                            console.log(
+                                '[WHATSAPP] Conexão fechada.'
+                            )
+
+
+                            console.log(
+                                '[WHATSAPP] Status da desconexão:',
+                                statusCode
+                            )
+
+
+                            /*
+                             * ==================================
+                             * RESTART 515
+                             * ==================================
+                             *
+                             * O Baileys está solicitando
+                             * que o socket seja reiniciado.
+                             *
+                             * NÃO apagamos a autenticação.
+                             * NÃO resetamos o estado.
+                             */
+
+                            if (
+                                statusCode ===
+                                515
+                            ) {
+
+                                console.log(
+                                    '[WHATSAPP] Baileys solicitou restart (515).'
+                                )
+
+
+                                clearQRTimeout()
+
+
+                                state.setConnected(
+                                    false
+                                )
+
+
+                                state.setStatus(
+                                    'Reiniciando conexão WhatsApp...'
+                                )
+
+
+                                io?.emit(
+                                    'whatsapp-state',
+                                    state.getState()
+                                )
+
+
+                                try {
+
+                                    await createSocket()
+
+                                } catch (error) {
+
+                                    console.error(
+                                        '[WHATSAPP] Erro ao reiniciar socket:',
+                                        error
+                                    )
+
+
+                                    state.reset()
+
+
+                                    io?.emit(
+                                        'whatsapp-state',
+                                        state.getState()
+                                    )
+                                }
+
+
+                                return
+                            }
+
+
+                            /*
+                             * ==================================
+                             * OUTRAS DESCONEXÕES
+                             * ==================================
+                             */
+
+                            clearQRTimeout()
+
+
+                            state.setConnected(
+                                false
+                            )
+
+
+                            state.setQR(
+                                false
+                            )
+
+
+                            state.setStatus(
+                                'WhatsApp desconectado.'
+                            )
+
+
+                            state.setGroups(
+                                []
+                            )
+
+
+                            io?.emit(
+                                'connected',
+                                false
+                            )
+
+
+                            io?.emit(
+                                'groups',
+                                []
+                            )
+
+
+                            io?.emit(
+                                'whatsapp-state',
+                                state.getState()
+                            )
+                        }
 
                     }
+                )
 
 
-                    /*
-                     * ==================================
-                     * DESCONECTADO
-                     * ==================================
-                     */
-
-                    if (
-                        connectionState ===
-                        'close'
-                    ) {
-
-                        console.log(
-                            '[WHATSAPP] Conexão fechada.'
-                        )
+                console.log(
+                    '[WHATSAPP] Socket WhatsApp criado.'
+                )
 
 
-                        clearQRTimeout()
+                return sock
+            }
 
 
-                        state.setConnected(
-                            false
-                        )
-
-
-                        state.setQR(
-                            false
-                        )
-
-
-                        state.setStatus(
-                            'WhatsApp desconectado.'
-                        )
-
-
-                        state.setGroups(
-                            []
-                        )
-
-
-                        io?.emit(
-                            'connected',
-                            false
-                        )
-
-
-                        io?.emit(
-                            'groups',
-                            []
-                        )
-
-
-                        io?.emit(
-                            'whatsapp-state',
-                            state.getState()
-                        )
-
-                    }
-
-                }
-            )
+            await createSocket()
 
 
             console.log(
@@ -467,7 +564,6 @@ function createWhatsApp(
 
                 message:
                     'WhatsApp iniciado.'
-
             }
 
         } catch (error) {
@@ -498,11 +594,8 @@ function createWhatsApp(
                 message:
                     error.message ||
                     'Erro ao iniciar WhatsApp.'
-
             }
-
         }
-
     }
 
 
@@ -522,7 +615,6 @@ function createWhatsApp(
             throw new Error(
                 'WhatsApp não está conectado.'
             )
-
         }
 
 
@@ -531,7 +623,6 @@ function createWhatsApp(
             target,
             message
         )
-
     }
 
 
@@ -550,7 +641,6 @@ function createWhatsApp(
             throw new Error(
                 'WhatsApp não está conectado.'
             )
-
         }
 
 
@@ -561,7 +651,6 @@ function createWhatsApp(
             throw new Error(
                 'Já existe um envio em andamento.'
             )
-
         }
 
 
@@ -576,7 +665,6 @@ function createWhatsApp(
             throw new Error(
                 'Nenhum grupo disponível.'
             )
-
         }
 
 
@@ -615,7 +703,6 @@ function createWhatsApp(
                             'send-progress',
                             progress
                         )
-
                     }
                 )
 
@@ -635,7 +722,6 @@ function createWhatsApp(
                     'send-finished',
                     result
                 )
-
             }
 
 
@@ -647,6 +733,7 @@ function createWhatsApp(
                 false
             )
 
+
             state.setCancelSending(
                 false
             )
@@ -656,9 +743,7 @@ function createWhatsApp(
                 'whatsapp-state',
                 state.getState()
             )
-
         }
-
     }
 
 
@@ -675,9 +760,7 @@ function createWhatsApp(
 
                 message:
                     'Nenhum envio em andamento.'
-
             }
-
         }
 
 
@@ -693,23 +776,19 @@ function createWhatsApp(
 
             message:
                 'Cancelamento solicitado.'
-
         }
-
     }
 
 
     function getState() {
 
         return state.getState()
-
     }
 
 
     function getSocket() {
 
         return state.getSocket()
-
     }
 
 
@@ -728,12 +807,9 @@ function createWhatsApp(
         sendToAll,
 
         cancelSending
-
     }
-
 }
 
 
 module.exports =
     createWhatsApp
-
