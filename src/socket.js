@@ -1,4 +1,6 @@
+
 // caminho: src/socket.js
+
 
 function setupSocket(
     io,
@@ -244,6 +246,36 @@ function setupSocket(
                                 : ''
 
 
+                        /*
+                         * ==================================
+                         * DELAY ENTRE OS GRUPOS
+                         * ==================================
+                         *
+                         * O frontend envia o delay
+                         * em segundos.
+                         *
+                         * Exemplo:
+                         *
+                         * delay: 5
+                         *
+                         * significa 5 segundos.
+                         */
+
+                        const delayValue =
+                            Number(
+                                data?.delay
+                            )
+
+
+                        const delay =
+                            Number.isFinite(
+                                delayValue
+                            ) &&
+                            delayValue >= 0
+                                ? delayValue
+                                : 5
+
+
                         if (
                             !groupIds.length
                         ) {
@@ -276,10 +308,26 @@ function setupSocket(
                         )
 
 
+                        console.log(
+                            '[SOCKET SERVER] Delay:',
+                            `${delay} segundos`
+                        )
+
+
+                        /*
+                         * ==================================
+                         * ENVIO
+                         * ==================================
+                         *
+                         * Agora o delay é passado para
+                         * sendToSelected().
+                         */
+
                         const result =
                             await whatsapp.sendToSelected(
                                 groupIds,
-                                message
+                                message,
+                                delay
                             )
 
 
