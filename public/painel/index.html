@@ -108,6 +108,28 @@
             background: #fafafa;
         }
 
+        .group:hover {
+            background: #f0f1f3;
+        }
+
+        .group-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .group-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        .group-content {
+            flex: 1;
+            min-width: 0;
+        }
+
         .group-name {
             font-weight: bold;
         }
@@ -117,6 +139,85 @@
             font-size: 12px;
             color: #777;
             word-break: break-all;
+        }
+
+        .selection-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f4f5f7;
+        }
+
+        .select-all {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .select-all input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .selected-count {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .message-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        #message {
+            width: 100%;
+            min-height: 180px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        #message:focus {
+            outline: none;
+            border-color: #111;
+        }
+
+        .send-area {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .send-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .send-info strong {
+            color: #222;
+        }
+
+        #send-status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f4f5f7;
+            color: #555;
+            font-size: 14px;
         }
 
         #logs {
@@ -150,7 +251,7 @@
     <h2>Teste de Grupos</h2>
 
     <div class="subtitle">
-        Página simplificada para testar o recebimento dos grupos.
+        Página simplificada para testar grupos e divulgação.
     </div>
 
 
@@ -199,12 +300,115 @@
             <strong id="group-count">0</strong>
         </div>
 
+
+        <div class="selection-bar">
+
+            <label class="select-all">
+
+                <input
+                    type="checkbox"
+                    id="select-all"
+                >
+
+                <span>
+                    Selecionar todos
+                </span>
+
+            </label>
+
+
+            <span
+                id="selected-count"
+                class="selected-count"
+            >
+                0 selecionados
+            </span>
+
+        </div>
+
+
         <div id="groups">
 
             <div class="empty">
                 Nenhum grupo recebido.
             </div>
 
+        </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- DIVULGAÇÃO                            -->
+    <!-- ===================================== -->
+
+    <div class="card">
+
+        <h3>Divulgação</h3>
+
+        <p class="subtitle">
+            Escreva a mensagem e selecione os grupos que receberão o envio.
+        </p>
+
+
+        <label
+            class="message-label"
+            for="message"
+        >
+            Mensagem
+        </label>
+
+
+        <textarea
+            id="message"
+            maxlength="4096"
+            placeholder="Digite aqui a mensagem da divulgação..."
+        ></textarea>
+
+
+        <div class="send-area">
+
+            <div class="send-info">
+
+                <strong id="send-target-count">
+                    0 grupos
+                </strong>
+
+                <div>
+                    selecionados para envio
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <button
+                    id="send-message"
+                    class="primary"
+                    type="button"
+                    disabled
+                >
+                    Enviar divulgação
+                </button>
+
+
+                <button
+                    id="cancel-send"
+                    class="secondary"
+                    type="button"
+                    disabled
+                >
+                    Cancelar
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div id="send-status">
+            Aguardando mensagem.
         </div>
 
     </div>
@@ -271,6 +475,54 @@
         )
 
 
+    const selectAll =
+        document.getElementById(
+            'select-all'
+        )
+
+
+    const selectedCount =
+        document.getElementById(
+            'selected-count'
+        )
+
+
+    const sendTargetCount =
+        document.getElementById(
+            'send-target-count'
+        )
+
+
+    const messageInput =
+        document.getElementById(
+            'message'
+        )
+
+
+    const sendButton =
+        document.getElementById(
+            'send-message'
+        )
+
+
+    const cancelButton =
+        document.getElementById(
+            'cancel-send'
+        )
+
+
+    const sendStatus =
+        document.getElementById(
+            'send-status'
+        )
+
+
+    let availableGroups = []
+
+
+    let sending = false
+
+
     function log(message, data) {
 
         const time =
@@ -317,6 +569,219 @@
             message,
             data
         )
+
+    }
+
+
+    function getSelectedGroups() {
+
+        return [
+            ...document.querySelectorAll(
+                '.group-checkbox:checked'
+            )
+        ].map(
+            checkbox =>
+                checkbox.value
+        )
+
+    }
+
+
+    function updateSelection() {
+
+        const selectedGroups =
+            getSelectedGroups()
+
+
+        const selected =
+            selectedGroups.length
+
+
+        selectedCount.textContent =
+            `${selected} selecionados`
+
+
+        sendTargetCount.textContent =
+            `${selected} ${
+                selected === 1
+                    ? 'grupo'
+                    : 'grupos'
+            }`
+
+
+        selectAll.checked =
+            availableGroups.length > 0 &&
+            selected ===
+                availableGroups.length
+
+
+        selectAll.indeterminate =
+            selected > 0 &&
+            selected <
+                availableGroups.length
+
+
+        updateSendButton()
+
+
+        log(
+            'SELEÇÃO ATUALIZADA',
+            {
+                quantidade:
+                    selected,
+                grupos:
+                    selectedGroups
+            }
+        )
+
+    }
+
+
+    function updateSendButton() {
+
+        const selectedGroups =
+            getSelectedGroups()
+
+
+        const message =
+            messageInput.value.trim()
+
+
+        sendButton.disabled =
+            !socket.connected ||
+            selectedGroups.length === 0 ||
+            message.length === 0 ||
+            sending
+
+    }
+
+
+    function renderGroups(groups) {
+
+        log(
+            'RENDERIZANDO GRUPOS',
+            groups
+        )
+
+
+        if (!Array.isArray(groups)) {
+
+            log(
+                'ERRO: groups não é um Array.'
+            )
+
+            return
+
+        }
+
+
+        availableGroups =
+            groups
+
+
+        groupCount.textContent =
+            groups.length
+
+
+        groupsContainer.innerHTML = ''
+
+
+        if (!groups.length) {
+
+            groupsContainer.innerHTML = `
+                <div class="empty">
+                    O servidor enviou 0 grupos.
+                </div>
+            `
+
+            updateSelection()
+
+            return
+
+        }
+
+
+        groups.forEach(
+            (group, index) => {
+
+                const div =
+                    document.createElement(
+                        'div'
+                    )
+
+
+                div.className =
+                    'group'
+
+
+                const name =
+                    group?.name ||
+                    `Grupo ${index + 1}`
+
+
+                const id =
+                    group?.id ||
+                    ''
+
+
+                div.innerHTML = `
+
+                    <div class="group-line">
+
+                        <input
+                            type="checkbox"
+                            class="group-checkbox"
+                            value="${escapeHtml(id)}"
+                        >
+
+                        <div class="group-content">
+
+                            <div class="group-name">
+                                ${escapeHtml(name)}
+                            </div>
+
+                            <div class="group-id">
+                                ${escapeHtml(id)}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                `
+
+
+                const checkbox =
+                    div.querySelector(
+                        '.group-checkbox'
+                    )
+
+
+                checkbox.addEventListener(
+                    'change',
+                    updateSelection
+                )
+
+
+                groupsContainer.appendChild(
+                    div
+                )
+
+            }
+        )
+
+
+        updateSelection()
+
+
+        log(
+            'GRUPOS RENDERIZADOS',
+            {
+                quantidade:
+                    groups.length
+            }
+        )
+
     }
 
 
@@ -342,6 +807,9 @@
                 socket.id
             )
 
+
+            updateSendButton()
+
         }
     )
 
@@ -363,6 +831,9 @@
                 reason
             )
 
+
+            updateSendButton()
+
         }
     )
 
@@ -383,6 +854,9 @@
                 'CONNECT ERROR',
                 error.message
             )
+
+
+            updateSendButton()
 
         }
     )
@@ -410,6 +884,28 @@
                 state
             )
 
+
+            /*
+             * O backend já envia os grupos
+             * dentro do whatsapp-state.
+             *
+             * Portanto podemos renderizar
+             * diretamente daqui.
+             */
+
+            if (
+                state &&
+                Array.isArray(
+                    state.groups
+                )
+            ) {
+
+                renderGroups(
+                    state.groups
+                )
+
+            }
+
         }
     )
 
@@ -424,78 +920,8 @@
             )
 
 
-            if (!Array.isArray(groups)) {
-
-                log(
-                    'ERRO: groups não é um Array.'
-                )
-
-                return
-
-            }
-
-
-            groupCount.textContent =
-                groups.length
-
-
-            groupsContainer.innerHTML = ''
-
-
-            if (!groups.length) {
-
-                groupsContainer.innerHTML = `
-                    <div class="empty">
-                        O servidor enviou 0 grupos.
-                    </div>
-                `
-
-                return
-
-            }
-
-
-            groups.forEach(
-                (group, index) => {
-
-                    const div =
-                        document.createElement(
-                            'div'
-                        )
-
-
-                    div.className =
-                        'group'
-
-
-                    const name =
-                        group?.name ||
-                        `Grupo ${index + 1}`
-
-
-                    const id =
-                        group?.id ||
-                        'ID não informado'
-
-
-                    div.innerHTML = `
-
-                        <div class="group-name">
-                            ${escapeHtml(name)}
-                        </div>
-
-                        <div class="group-id">
-                            ${escapeHtml(id)}
-                        </div>
-
-                    `
-
-
-                    groupsContainer.appendChild(
-                        div
-                    )
-
-                }
+            renderGroups(
+                groups
             )
 
         }
@@ -523,15 +949,6 @@
             )
 
 
-            /*
-             * IMPORTANTE:
-             *
-             * Estamos tentando descobrir
-             * qual evento o backend espera.
-             *
-             * Primeiro tentamos "get-groups".
-             */
-
             socket.emit(
                 'get-groups'
             )
@@ -545,12 +962,377 @@
     )
 
 
+    selectAll.addEventListener(
+        'change',
+        () => {
+
+            const checkboxes =
+                document.querySelectorAll(
+                    '.group-checkbox'
+                )
+
+
+            checkboxes.forEach(
+                checkbox => {
+
+                    checkbox.checked =
+                        selectAll.checked
+
+                }
+            )
+
+
+            updateSelection()
+
+        }
+    )
+
+
+    messageInput.addEventListener(
+        'input',
+        () => {
+
+            updateSendButton()
+
+        }
+    )
+
+
+    /*
+     * =====================================
+     * FUNÇÃO DE ENVIO
+     * =====================================
+     */
+
+    function sendMessage() {
+
+        log(
+            'BOTÃO "ENVIAR DIVULGAÇÃO" CLICADO.'
+        )
+
+
+        const groupIds =
+            getSelectedGroups()
+
+
+        const message =
+            messageInput.value.trim()
+
+
+        log(
+            'GRUPOS SELECIONADOS:',
+            groupIds
+        )
+
+
+        log(
+            'MENSAGEM:',
+            message
+        )
+
+
+        if (!socket.connected) {
+
+            log(
+                'ERRO: Socket desconectado.'
+            )
+
+            sendStatus.textContent =
+                'Erro: conexão com o servidor não está disponível.'
+
+            return
+
+        }
+
+
+        if (!groupIds.length) {
+
+            sendStatus.textContent =
+                'Selecione pelo menos um grupo.'
+
+            log(
+                'ERRO: nenhum grupo selecionado.'
+            )
+
+            return
+
+        }
+
+
+        if (!message) {
+
+            sendStatus.textContent =
+                'Digite uma mensagem.'
+
+            log(
+                'ERRO: mensagem vazia.'
+            )
+
+            return
+
+        }
+
+
+        if (sending) {
+
+            log(
+                'ENVIO JÁ ESTÁ EM ANDAMENTO.'
+            )
+
+            return
+
+        }
+
+
+        sending = true
+
+
+        sendButton.disabled = true
+        cancelButton.disabled = false
+
+
+        sendStatus.textContent =
+            `Enviando para ${groupIds.length} grupos...`
+
+
+        const data = {
+
+            groupIds:
+                groupIds,
+
+            message:
+                message
+
+        }
+
+
+        log(
+            'ENVIANDO EVENTO "send-message"',
+            data
+        )
+
+
+        socket.emit(
+            'send-message',
+            data
+        )
+
+
+        log(
+            'EVENTO "send-message" ENVIADO.'
+        )
+
+    }
+
+
+    sendButton.addEventListener(
+        'click',
+        sendMessage
+    )
+
+
+    /*
+     * =====================================
+     * CANCELAR ENVIO
+     * =====================================
+     */
+
+    cancelButton.addEventListener(
+        'click',
+        () => {
+
+            log(
+                'BOTÃO "CANCELAR" CLICADO.'
+            )
+
+
+            socket.emit(
+                'cancel-send'
+            )
+
+
+            sendStatus.textContent =
+                'Solicitação de cancelamento enviada.'
+
+        }
+    )
+
+
+    /*
+     * =====================================
+     * RESULTADO DO ENVIO
+     * =====================================
+     */
+
+    socket.on(
+        'send-result',
+        data => {
+
+            log(
+                'SEND-RESULT RECEBIDO',
+                data
+            )
+
+
+            if (
+                data &&
+                data.success === false
+            ) {
+
+                sending = false
+
+                cancelButton.disabled =
+                    true
+
+
+                sendStatus.textContent =
+                    data.message ||
+                    'Erro ao enviar mensagem.'
+
+
+                updateSendButton()
+
+                return
+
+            }
+
+
+            if (
+                data &&
+                data.success === true
+            ) {
+
+                sendStatus.textContent =
+                    'Envio concluído.'
+
+            }
+
+        }
+    )
+
+
+    socket.on(
+        'send-started',
+        data => {
+
+            log(
+                'SEND-STARTED RECEBIDO',
+                data
+            )
+
+        }
+    )
+
+
+    socket.on(
+        'send-progress',
+        data => {
+
+            log(
+                'SEND-PROGRESS RECEBIDO',
+                data
+            )
+
+
+            if (!data) {
+                return
+            }
+
+
+            const current =
+                data.current || 0
+
+
+            const total =
+                data.total || 0
+
+
+            if (total > 0) {
+
+                sendStatus.textContent =
+                    `Enviando ${current} de ${total}: ${
+                        data.group || ''
+                    }`
+
+            }
+
+        }
+    )
+
+
+    socket.on(
+        'send-finished',
+        data => {
+
+            log(
+                'SEND-FINISHED RECEBIDO',
+                data
+            )
+
+
+            sending = false
+
+
+            cancelButton.disabled =
+                true
+
+
+            sendStatus.textContent =
+                'Envio concluído.'
+
+
+            updateSendButton()
+
+        }
+    )
+
+
+    socket.on(
+        'send-cancelled',
+        data => {
+
+            log(
+                'SEND-CANCELLED RECEBIDO',
+                data
+            )
+
+
+            sending = false
+
+
+            cancelButton.disabled =
+                true
+
+
+            sendStatus.textContent =
+                'Envio cancelado.'
+
+
+            updateSendButton()
+
+        }
+    )
+
+
+    socket.on(
+        'cancel-result',
+        data => {
+
+            log(
+                'CANCEL-RESULT RECEBIDO',
+                data
+            )
+
+        }
+    )
+
+
     disconnectButton.addEventListener(
         'click',
         () => {
 
             log(
-                'BOTÃO DESCONectar CLICADO.'
+                'BOTÃO "DESCONECTAR" CLICADO.'
             )
 
 
