@@ -1,19 +1,9 @@
 // caminho: public/painel/js/panel.js
 
-console.log(
-    '[PANEL] ===== INÍCIO DO panel.js ====='
-)
-
-
 import {
     setupGroups,
     updateGroupsConnection
 } from './groups.js'
-
-
-console.log(
-    '[PANEL] groups.js importado com sucesso.'
-)
 
 
 import {
@@ -23,7 +13,7 @@ import {
 
 
 console.log(
-    '[PANEL] messages.js importado com sucesso.'
+    '[PANEL] Iniciando painel.'
 )
 
 
@@ -32,13 +22,8 @@ const socket =
 
 
 console.log(
-    '[PANEL] Socket.IO criado.'
-)
-
-
-console.log(
-    '[PANEL] socket.connected:',
-    socket.connected
+    '[PANEL] Socket criado:',
+    socket.id
 )
 
 
@@ -60,105 +45,69 @@ const disconnectButton =
     )
 
 
-console.log(
-    '[PANEL] Elementos encontrados:',
-    {
-        connectionStatus: Boolean(
-            connectionStatus
-        ),
+/*
+ * CONFIGURA OS MÓDULOS
+ */
 
-        connectionDot: Boolean(
-            connectionDot
-        ),
-
-        disconnectButton: Boolean(
-            disconnectButton
-        )
-    }
+setupGroups(
+    socket
 )
 
 
-function setConnectionStatus(
-    connected
-) {
-
-    console.log(
-        '[PANEL] Alterando status de conexão:',
-        connected
-    )
+setupMessages(
+    socket
+)
 
 
-    if (connected) {
-
-        connectionStatus.textContent =
-            'Connected'
-
-        connectionDot.classList.add(
-            'connected'
-        )
-
-    } else {
-
-        connectionStatus.textContent =
-            'Disconnected'
-
-        connectionDot.classList.remove(
-            'connected'
-        )
-
-    }
+console.log(
+    '[PANEL] Módulos configurados.'
+)
 
 
-    console.log(
-        '[PANEL] Atualizando conexão dos grupos.'
-    )
-
-
-    updateGroupsConnection(
-        connected
-    )
-
-
-    console.log(
-        '[PANEL] Atualizando conexão das mensagens.'
-    )
-
-
-    updateMessagesConnection(
-        connected
-    )
-
-}
-
+/*
+ * SOCKET CONECTADO
+ */
 
 socket.on(
     'connect',
     () => {
 
         console.log(
-            '[PANEL] ============================='
+            '[PANEL] ======================='
         )
+
 
         console.log(
             '[PANEL] SOCKET CONECTADO'
         )
 
+
         console.log(
-            '[PANEL] Socket ID:',
+            '[PANEL] ID:',
             socket.id
         )
 
-        console.log(
-            '[PANEL] Transport:',
-            socket.io.engine.transport.name
-        )
 
         console.log(
-            '[PANEL] ============================='
+            '[PANEL] ======================='
         )
 
 
-        setConnectionStatus(
+        connectionStatus.textContent =
+            'Connected'
+
+
+        connectionDot.classList.add(
+            'connected'
+        )
+
+
+        updateGroupsConnection(
+            true
+        )
+
+
+        updateMessagesConnection(
             true
         )
 
@@ -166,21 +115,35 @@ socket.on(
 )
 
 
+/*
+ * SOCKET DESCONECTADO
+ */
+
 socket.on(
     'disconnect',
     reason => {
 
-        console.error(
-            '[PANEL] SOCKET DESCONECTADO'
-        )
-
-        console.error(
-            '[PANEL] Motivo:',
+        console.log(
+            '[PANEL] SOCKET DESCONECTADO:',
             reason
         )
 
 
-        setConnectionStatus(
+        connectionStatus.textContent =
+            'Disconnected'
+
+
+        connectionDot.classList.remove(
+            'connected'
+        )
+
+
+        updateGroupsConnection(
+            false
+        )
+
+
+        updateMessagesConnection(
             false
         )
 
@@ -188,35 +151,30 @@ socket.on(
 )
 
 
+/*
+ * ERRO DE CONEXÃO
+ */
+
 socket.on(
     'connect_error',
     error => {
 
         console.error(
-            '[PANEL] SOCKET CONNECT ERROR'
-        )
-
-        console.error(
-            '[PANEL] Mensagem:',
+            '[PANEL] CONNECT ERROR:',
             error.message
         )
 
-        console.error(
-            '[PANEL] Erro completo:',
-            error
-        )
 
-
-        if (connectionStatus) {
-
-            connectionStatus.textContent =
-                'Connection error'
-
-        }
+        connectionStatus.textContent =
+            'Connection error'
 
     }
 )
 
+
+/*
+ * ERRO DE AUTENTICAÇÃO
+ */
 
 socket.on(
     'auth-error',
@@ -228,10 +186,46 @@ socket.on(
         )
 
 
-        if (connectionStatus) {
+        connectionStatus.textContent =
+            'Authentication error'
 
-            connectionStatus.textContent =
-                'Authentication error'
+    }
+)
+
+
+/*
+ * ESTADO DO WHATSAPP
+ *
+ * Colocamos também aqui um
+ * listener direto.
+ *
+ * Assim conseguimos garantir
+ * que os grupos sejam desenhados
+ * mesmo que o módulo groups.js
+ * tenha algum problema.
+ */
+
+socket.on(
+    'whatsapp-state',
+    state => {
+
+        console.log(
+            '[PANEL] WHATSAPP-STATE:',
+            state
+        )
+
+
+        if (
+            state &&
+            Array.isArray(
+                state.groups
+            )
+        ) {
+
+            console.log(
+                '[PANEL] Grupos recebidos:',
+                state.groups.length
+            )
 
         }
 
@@ -239,35 +233,9 @@ socket.on(
 )
 
 
-console.log(
-    '[PANEL] Configurando grupos...'
-)
-
-
-setupGroups(
-    socket
-)
-
-
-console.log(
-    '[PANEL] Grupos configurados.'
-)
-
-
-console.log(
-    '[PANEL] Configurando mensagens...'
-)
-
-
-setupMessages(
-    socket
-)
-
-
-console.log(
-    '[PANEL] Mensagens configuradas.'
-)
-
+/*
+ * BOTÃO DISCONNECT
+ */
 
 if (disconnectButton) {
 
@@ -276,29 +244,13 @@ if (disconnectButton) {
         () => {
 
             console.log(
-                '[PANEL] Botão Disconnect clicado.'
-            )
-
-            console.log(
-                '[PANEL] Socket antes:',
-                socket.connected
+                '[PANEL] Disconnect clicado.'
             )
 
 
             socket.disconnect()
 
-
-            console.log(
-                '[PANEL] Socket depois:',
-                socket.connected
-            )
-
         }
     )
 
 }
-
-
-console.log(
-    '[PANEL] ===== FIM DA INICIALIZAÇÃO ====='
-)
