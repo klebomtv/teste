@@ -12,10 +12,15 @@ const pino =
         'pino'
     )
 
+const {
+    generateQR
+} =
+    require(
+        './qr'
+    )
+
 
 // Logger do Baileys.
-// Mantemos silencioso para não poluir
-// os logs da aplicação.
 const logger =
     pino({
         level: 'silent'
@@ -23,12 +28,14 @@ const logger =
 
 
 function createConnection(
-    auth
+    auth,
+    onQR
 ) {
 
     console.log(
         '[WHATSAPP CONNECTION] Criando conexão Baileys.'
     )
+
 
     const sock =
         makeWASocket({
@@ -46,7 +53,7 @@ function createConnection(
 
     sock.ev.on(
         'connection.update',
-        update => {
+        async update => {
 
             const {
                 connection,
@@ -55,13 +62,55 @@ function createConnection(
             } = update
 
 
+            /*
+             * QR CODE
+             */
+
             if (qr) {
 
                 console.log(
                     '[WHATSAPP CONNECTION] QR recebido pelo Baileys.'
                 )
+
+
+                const result =
+                    await generateQR(
+                        qr
+                    )
+
+
+                if (
+                    result.success
+                ) {
+
+                    console.log(
+                        '[WHATSAPP CONNECTION] QR Code gerado.'
+                    )
+
+
+                    if (
+                        onQR
+                    ) {
+
+                        onQR()
+
+                    }
+
+                } else {
+
+                    console.error(
+                        '[WHATSAPP CONNECTION] Falha ao gerar QR:',
+                        result.message
+                    )
+
+                }
+
             }
 
+
+            /*
+             * CONECTADO
+             */
 
             if (
                 connection === 'open'
@@ -70,8 +119,13 @@ function createConnection(
                 console.log(
                     '[WHATSAPP CONNECTION] Conexão aberta.'
                 )
+
             }
 
+
+            /*
+             * DESCONECTADO
+             */
 
             if (
                 connection === 'close'
@@ -81,21 +135,26 @@ function createConnection(
                     '[WHATSAPP CONNECTION] Conexão fechada.'
                 )
 
+
                 console.error(
                     '[WHATSAPP CONNECTION] Motivo:',
                     lastDisconnect?.error
                 )
 
+
                 console.error(
                     '[WHATSAPP CONNECTION] Status:',
                     lastDisconnect?.error?.output?.statusCode
                 )
+
             }
+
         }
     )
 
 
     return sock
+
 }
 
 
