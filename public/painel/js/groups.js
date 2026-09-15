@@ -1,6 +1,14 @@
 // caminho: public/painel/js/groups.js
 
+console.log(
+    '[GROUPS] ===== groups.js CARREGADO ====='
+)
+
+
 let availableGroups = []
+
+
+let socketConnected = false
 
 
 const groupsContainer =
@@ -28,65 +36,92 @@ const selectAll =
 
 
 console.log(
-    '[GROUPS] Módulo groups.js carregado.'
+    '[GROUPS] Elementos encontrados:',
+    {
+        groupsContainer:
+            Boolean(
+                groupsContainer
+            ),
+
+        groupCount:
+            Boolean(
+                groupCount
+            ),
+
+        selectedCount:
+            Boolean(
+                selectedCount
+            ),
+
+        selectAll:
+            Boolean(
+                selectAll
+            )
+    }
 )
 
-
-/*
- * ==========================================
- * CONEXÃO
- * ==========================================
- */
 
 export function updateGroupsConnection(
     connected
 ) {
 
     console.log(
-        '[GROUPS] Estado da conexão:',
+        '[GROUPS] updateGroupsConnection:',
         connected
     )
 
+
+    socketConnected =
+        connected
+
 }
 
-
-/*
- * ==========================================
- * RENDERIZAR GRUPOS
- * ==========================================
- */
 
 function renderGroups(
     groups
 ) {
 
     console.log(
-        '[GROUPS] Renderizando grupos:',
+        '[GROUPS] ===== RENDERIZANDO GRUPOS ====='
+    )
+
+
+    console.log(
+        '[GROUPS] Dados recebidos:',
         groups
     )
 
 
-    if (
-        !Array.isArray(groups)
-    ) {
+    console.log(
+        '[GROUPS] É array:',
+        Array.isArray(groups)
+    )
+
+
+    console.log(
+        '[GROUPS] Quantidade:',
+        Array.isArray(groups)
+            ? groups.length
+            : 0
+    )
+
+
+    availableGroups =
+        Array.isArray(groups)
+            ? groups
+            : []
+
+
+    if (!groupsContainer) {
 
         console.error(
-            '[GROUPS] ERRO: groups não é um array.',
-            groups
+            '[GROUPS] ERRO: #groups não existe no HTML.'
         )
 
         return
 
     }
 
-
-    availableGroups =
-        groups
-
-
-    /*
-     * Atualiza contador.
-     */
 
     if (groupCount) {
 
@@ -96,51 +131,42 @@ function renderGroups(
     }
 
 
-    /*
-     * Limpa lista atual.
-     */
+    groupsContainer.innerHTML =
+        ''
 
-    if (groupsContainer) {
-
-        groupsContainer.innerHTML = ''
-
-    }
-
-
-    /*
-     * Nenhum grupo.
-     */
 
     if (
         availableGroups.length === 0
     ) {
 
-        if (groupsContainer) {
+        console.warn(
+            '[GROUPS] Nenhum grupo para renderizar.'
+        )
 
-            groupsContainer.innerHTML = `
 
-                <div class="loading">
-                    Nenhum grupo encontrado.
-                </div>
-
-            `
-
-        }
+        groupsContainer.innerHTML =
+            '<div class="loading">Nenhum grupo encontrado.</div>'
 
 
         updateSelection()
+
 
         return
 
     }
 
 
-    /*
-     * Cria cada grupo.
-     */
-
     availableGroups.forEach(
-        (group, index) => {
+        (
+            group,
+            index
+        ) => {
+
+            console.log(
+                `[GROUPS] Criando grupo ${index + 1}:`,
+                group
+            )
+
 
             const label =
                 document.createElement(
@@ -167,7 +193,7 @@ function renderGroups(
 
 
             checkbox.value =
-                group.id || ''
+                group?.id || ''
 
 
             checkbox.dataset.index =
@@ -181,8 +207,8 @@ function renderGroups(
 
 
             name.textContent =
-                group.name ||
-                'Grupo sem nome'
+                group?.name ||
+                `Grupo ${index + 1}`
 
 
             label.appendChild(
@@ -202,10 +228,35 @@ function renderGroups(
 
             checkbox.addEventListener(
                 'change',
-                updateSelection
+                () => {
+
+                    console.log(
+                        '[GROUPS] Checkbox alterado:',
+                        {
+                            id:
+                                checkbox.value,
+
+                            name:
+                                name.textContent,
+
+                            checked:
+                                checkbox.checked
+                        }
+                    )
+
+
+                    updateSelection()
+
+                }
             )
 
         }
+    )
+
+
+    console.log(
+        '[GROUPS] Grupos adicionados ao DOM:',
+        groupsContainer.children.length
     )
 
 
@@ -213,51 +264,88 @@ function renderGroups(
 
 
     console.log(
-        '[GROUPS] Grupos renderizados:',
-        availableGroups.length
+        '[GROUPS] ===== FIM DO RENDER ====='
     )
 
 }
 
 
-/*
- * ==========================================
- * WHATSAPP STATE
- * ==========================================
- */
+function handleGroups(
+    groups
+) {
+
+    console.log(
+        '[GROUPS] ============================='
+    )
+
+    console.log(
+        '[GROUPS] EVENTO "groups" RECEBIDO'
+    )
+
+    console.log(
+        '[GROUPS] Dados:',
+        groups
+    )
+
+    console.log(
+        '[GROUPS] ============================='
+    )
+
+
+    renderGroups(
+        groups
+    )
+
+}
+
 
 function handleWhatsappState(
     state
 ) {
 
     console.log(
-        '[GROUPS] WHATSAPP-STATE recebido:',
+        '[GROUPS] ============================='
+    )
+
+    console.log(
+        '[GROUPS] EVENTO "whatsapp-state" RECEBIDO'
+    )
+
+    console.log(
+        '[GROUPS] Estado completo:',
         state
     )
 
-
-    if (!state) {
-
-        console.error(
-            '[GROUPS] State vazio.'
-        )
-
-        return
-
-    }
-
+    console.log(
+        '[GROUPS] groups:',
+        state?.groups
+    )
 
     console.log(
-        '[GROUPS] state.groups:',
-        state.groups
+        '[GROUPS] Quantidade:',
+        Array.isArray(
+            state?.groups
+        )
+            ? state.groups.length
+            : 0
+    )
+
+    console.log(
+        '[GROUPS] ============================='
     )
 
 
     if (
+        state &&
         Array.isArray(
             state.groups
         )
     ) {
+
+        console.log(
+            '[GROUPS] Renderizando grupos vindos do whatsapp-state.'
+        )
+
 
         renderGroups(
             state.groups
@@ -266,7 +354,7 @@ function handleWhatsappState(
     } else {
 
         console.warn(
-            '[GROUPS] state.groups não é um array.'
+            '[GROUPS] whatsapp-state não possui groups válido.'
         )
 
     }
@@ -274,31 +362,33 @@ function handleWhatsappState(
 }
 
 
-/*
- * ==========================================
- * GRUPOS SELECIONADOS
- * ==========================================
- */
-
 export function getSelectedGroups() {
 
-    return [
-        ...document.querySelectorAll(
+    const checkboxes =
+        document.querySelectorAll(
             '.group-checkbox:checked'
         )
-    ].map(
-        checkbox =>
-            checkbox.value
+
+
+    const selected =
+        [
+            ...checkboxes
+        ].map(
+            checkbox =>
+                checkbox.value
+        )
+
+
+    console.log(
+        '[GROUPS] Grupos selecionados:',
+        selected
     )
+
+
+    return selected
 
 }
 
-
-/*
- * ==========================================
- * ATUALIZAR SELEÇÃO
- * ==========================================
- */
 
 function updateSelection() {
 
@@ -310,9 +400,15 @@ function updateSelection() {
         availableGroups.length
 
 
-    /*
-     * Contador principal.
-     */
+    console.log(
+        '[GROUPS] Atualizando seleção:',
+        {
+            total,
+            selected:
+                selected.length
+        }
+    )
+
 
     if (selectedCount) {
 
@@ -321,10 +417,6 @@ function updateSelection() {
 
     }
 
-
-    /*
-     * Contador da área de envio.
-     */
 
     const sendTargetCount =
         document.getElementById(
@@ -344,10 +436,6 @@ function updateSelection() {
     }
 
 
-    /*
-     * Select all.
-     */
-
     if (selectAll) {
 
         selectAll.checked =
@@ -362,24 +450,19 @@ function updateSelection() {
     }
 
 
-    /*
-     * Informa o messages.js.
-     */
-
     document.dispatchEvent(
         new CustomEvent(
             'groups-selection-changed'
         )
     )
 
+
+    console.log(
+        '[GROUPS] Evento groups-selection-changed disparado.'
+    )
+
 }
 
-
-/*
- * ==========================================
- * SELECIONAR TODOS
- * ==========================================
- */
 
 if (selectAll) {
 
@@ -388,7 +471,7 @@ if (selectAll) {
         () => {
 
             console.log(
-                '[GROUPS] Select all:',
+                '[GROUPS] SELECT ALL alterado:',
                 selectAll.checked
             )
 
@@ -397,6 +480,12 @@ if (selectAll) {
                 document.querySelectorAll(
                     '.group-checkbox'
                 )
+
+
+            console.log(
+                '[GROUPS] Checkboxes encontrados:',
+                checkboxes.length
+            )
 
 
             checkboxes.forEach(
@@ -417,36 +506,37 @@ if (selectAll) {
 }
 
 
-/*
- * ==========================================
- * CONFIGURAR MÓDULO
- * ==========================================
- */
-
 export function setupGroups(
     socket
 ) {
 
     console.log(
-        '[GROUPS] Configurando módulo...'
+        '[GROUPS] ===== setupGroups() ====='
     )
 
 
-    if (!socket) {
-
-        console.error(
-            '[GROUPS] Socket não recebido.'
-        )
-
-        return
-
-    }
+    console.log(
+        '[GROUPS] Socket recebido:',
+        socket
+    )
 
 
-    /*
-     * O backend atual envia os grupos
-     * dentro de whatsapp-state.
-     */
+    console.log(
+        '[GROUPS] socket.connected:',
+        socket?.connected
+    )
+
+
+    socket.on(
+        'groups',
+        handleGroups
+    )
+
+
+    console.log(
+        '[GROUPS] Listener "groups" registrado.'
+    )
+
 
     socket.on(
         'whatsapp-state',
@@ -455,7 +545,12 @@ export function setupGroups(
 
 
     console.log(
-        '[GROUPS] Listener whatsapp-state registrado.'
+        '[GROUPS] Listener "whatsapp-state" registrado.'
+    )
+
+
+    console.log(
+        '[GROUPS] ===== setupGroups() FINALIZADO ====='
     )
 
 }

@@ -1,9 +1,19 @@
 // caminho: public/painel/js/panel.js
 
+console.log(
+    '[PANEL] ===== INÍCIO DO panel.js ====='
+)
+
+
 import {
     setupGroups,
     updateGroupsConnection
 } from './groups.js'
+
+
+console.log(
+    '[PANEL] groups.js importado com sucesso.'
+)
 
 
 import {
@@ -13,12 +23,23 @@ import {
 
 
 console.log(
-    '[PANEL] panel.js carregado.'
+    '[PANEL] messages.js importado com sucesso.'
 )
 
 
 const socket =
     io()
+
+
+console.log(
+    '[PANEL] Socket.IO criado.'
+)
+
+
+console.log(
+    '[PANEL] socket.connected:',
+    socket.connected
+)
 
 
 const connectionStatus =
@@ -39,37 +60,38 @@ const disconnectButton =
     )
 
 
-/*
- * ==========================================
- * CONFIGURAR MÓDULOS
- * ==========================================
- */
+console.log(
+    '[PANEL] Elementos encontrados:',
+    {
+        connectionStatus: Boolean(
+            connectionStatus
+        ),
 
-setupGroups(
-    socket
+        connectionDot: Boolean(
+            connectionDot
+        ),
+
+        disconnectButton: Boolean(
+            disconnectButton
+        )
+    }
 )
 
-
-setupMessages(
-    socket
-)
-
-
-/*
- * ==========================================
- * STATUS DA CONEXÃO
- * ==========================================
- */
 
 function setConnectionStatus(
     connected
 ) {
 
+    console.log(
+        '[PANEL] Alterando status de conexão:',
+        connected
+    )
+
+
     if (connected) {
 
         connectionStatus.textContent =
             'Connected'
-
 
         connectionDot.classList.add(
             'connected'
@@ -80,7 +102,6 @@ function setConnectionStatus(
         connectionStatus.textContent =
             'Disconnected'
 
-
         connectionDot.classList.remove(
             'connected'
         )
@@ -88,8 +109,18 @@ function setConnectionStatus(
     }
 
 
+    console.log(
+        '[PANEL] Atualizando conexão dos grupos.'
+    )
+
+
     updateGroupsConnection(
         connected
+    )
+
+
+    console.log(
+        '[PANEL] Atualizando conexão das mensagens.'
     )
 
 
@@ -100,25 +131,30 @@ function setConnectionStatus(
 }
 
 
-/*
- * ==========================================
- * SOCKET CONECTADO
- * ==========================================
- */
-
 socket.on(
     'connect',
     () => {
 
         console.log(
-            '[PANEL] Socket conectado:',
-            socket.id
+            '[PANEL] ============================='
         )
 
+        console.log(
+            '[PANEL] SOCKET CONECTADO'
+        )
+
+        console.log(
+            '[PANEL] Socket ID:',
+            socket.id
+        )
 
         console.log(
             '[PANEL] Transport:',
             socket.io.engine.transport.name
+        )
+
+        console.log(
+            '[PANEL] ============================='
         )
 
 
@@ -130,18 +166,16 @@ socket.on(
 )
 
 
-/*
- * ==========================================
- * SOCKET DESCONECTADO
- * ==========================================
- */
-
 socket.on(
     'disconnect',
     reason => {
 
-        console.warn(
-            '[PANEL] Socket desconectado:',
+        console.error(
+            '[PANEL] SOCKET DESCONECTADO'
+        )
+
+        console.error(
+            '[PANEL] Motivo:',
             reason
         )
 
@@ -154,63 +188,86 @@ socket.on(
 )
 
 
-/*
- * ==========================================
- * ERRO DE CONEXÃO
- * ==========================================
- */
-
 socket.on(
     'connect_error',
     error => {
 
         console.error(
-            '[PANEL] Erro Socket.IO:',
+            '[PANEL] SOCKET CONNECT ERROR'
+        )
+
+        console.error(
+            '[PANEL] Mensagem:',
+            error.message
+        )
+
+        console.error(
+            '[PANEL] Erro completo:',
             error
         )
 
 
-        connectionStatus.textContent =
-            'Connection error'
+        if (connectionStatus) {
+
+            connectionStatus.textContent =
+                'Connection error'
+
+        }
 
     }
 )
 
-
-/*
- * ==========================================
- * ERRO DE AUTENTICAÇÃO
- * ==========================================
- */
 
 socket.on(
     'auth-error',
     data => {
 
         console.error(
-            '[PANEL] Erro de autenticação:',
+            '[PANEL] AUTH ERROR:',
             data
         )
 
 
-        connectionStatus.textContent =
-            'Authentication error'
+        if (connectionStatus) {
+
+            connectionStatus.textContent =
+                'Authentication error'
+
+        }
 
     }
 )
 
 
-/*
- * ==========================================
- * DISCONNECT
- * ==========================================
- *
- * Por enquanto este botão desconecta
- * somente o Socket.IO do painel.
- *
- * NÃO desconecta o WhatsApp.
- *
- */
+console.log(
+    '[PANEL] Configurando grupos...'
+)
+
+
+setupGroups(
+    socket
+)
+
+
+console.log(
+    '[PANEL] Grupos configurados.'
+)
+
+
+console.log(
+    '[PANEL] Configurando mensagens...'
+)
+
+
+setupMessages(
+    socket
+)
+
+
+console.log(
+    '[PANEL] Mensagens configuradas.'
+)
+
 
 if (disconnectButton) {
 
@@ -222,10 +279,26 @@ if (disconnectButton) {
                 '[PANEL] Botão Disconnect clicado.'
             )
 
+            console.log(
+                '[PANEL] Socket antes:',
+                socket.connected
+            )
+
 
             socket.disconnect()
+
+
+            console.log(
+                '[PANEL] Socket depois:',
+                socket.connected
+            )
 
         }
     )
 
 }
+
+
+console.log(
+    '[PANEL] ===== FIM DA INICIALIZAÇÃO ====='
+)
