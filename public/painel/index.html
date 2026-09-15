@@ -1,4 +1,4 @@
-// caminho: public/painel/index.html
+<!-- caminho: public/painel/index.html -->
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -12,381 +12,586 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>WhatsApp Broadcast</title>
+    <title>Teste de Grupos</title>
 
-    <link
-        rel="stylesheet"
-        href="/painel/style.css"
-    >
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+            font-family: Arial, sans-serif;
+            background: #f4f5f7;
+            color: #222;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #999;
+        }
+
+        .dot.connected {
+            background: #22c55e;
+        }
+
+        .dot.error {
+            background: #ef4444;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+
+        .primary {
+            background: #111;
+            color: #fff;
+        }
+
+        .secondary {
+            background: #e5e7eb;
+            color: #111;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #groups {
+            margin-top: 20px;
+        }
+
+        .group {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #fafafa;
+        }
+
+        .group-name {
+            font-weight: bold;
+        }
+
+        .group-id {
+            margin-top: 4px;
+            font-size: 12px;
+            color: #777;
+            word-break: break-all;
+        }
+
+        #logs {
+            background: #111;
+            color: #00ff88;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 150px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .empty {
+            color: #777;
+            padding: 20px 0;
+        }
+
+    </style>
 
 </head>
 
-
 <body>
 
-<main class="app">
+<div class="container">
+
+    <h1>W</h1>
+
+    <h2>Teste de Grupos</h2>
+
+    <div class="subtitle">
+        Página simplificada para testar o recebimento dos grupos.
+    </div>
 
 
-    <!-- ========================================= -->
-    <!-- CABEÇALHO                                 -->
-    <!-- ========================================= -->
+    <div class="card">
 
-    <header class="header">
-
-        <div class="brand">
-
-            <div class="brand-mark">
-                W
-            </div>
-
-            <div>
-
-                <h1>
-                    WhatsApp Broadcast
-                </h1>
-
-                <span>
-                    Painel de divulgação
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="connection">
+        <div class="status">
 
             <span
                 id="connection-dot"
-                class="connection-dot"
+                class="dot"
             ></span>
 
-
-            <span id="connection-status">
+            <strong id="connection-status">
                 Conectando...
-            </span>
-
-
-            <button
-                id="disconnect"
-                class="button button-secondary"
-                type="button"
-            >
-                Desconectar
-            </button>
+            </strong>
 
         </div>
 
-    </header>
+
+        <button
+            id="get-groups"
+            class="primary"
+            type="button"
+        >
+            Buscar grupos
+        </button>
 
 
+        <button
+            id="disconnect"
+            class="secondary"
+            type="button"
+        >
+            Desconectar
+        </button>
 
-    <!-- ========================================= -->
-    <!-- ÁREA PRINCIPAL                            -->
-    <!-- ========================================= -->
-
-    <section class="workspace">
-
-
-        <!-- ===================================== -->
-        <!-- GRUPOS                                -->
-        <!-- ===================================== -->
-
-        <section class="card groups-card">
-
-            <div class="card-header">
-
-                <div>
-
-                    <h2>
-                        Grupos
-                    </h2>
-
-                    <p>
-                        Selecione os grupos que receberão a divulgação.
-                    </p>
-
-                </div>
+    </div>
 
 
-                <span
-                    id="group-count"
-                    class="counter"
-                >
-                    0
-                </span>
+    <div class="card">
 
+        <h3>Grupos</h3>
+
+        <div>
+            Total:
+            <strong id="group-count">0</strong>
+        </div>
+
+        <div id="groups">
+
+            <div class="empty">
+                Nenhum grupo recebido.
             </div>
 
+        </div>
 
+    </div>
 
-            <!-- ================================= -->
-            <!-- CONTROLES DOS GRUPOS              -->
-            <!-- ================================= -->
 
-            <div class="group-actions">
+    <div class="card">
 
-                <label class="select-all">
+        <h3>Logs</h3>
 
-                    <input
-                        type="checkbox"
-                        id="select-all"
-                    >
+        <div id="logs"></div>
 
-                    <span>
-                        Selecionar todos
-                    </span>
+    </div>
 
-                </label>
+</div>
 
 
-                <span
-                    id="selected-count"
-                    class="selected-count"
-                >
-                    0 selecionados
-                </span>
+<script src="/socket.io/socket.io.js"></script>
 
-            </div>
 
+<script type="module">
 
+    const socket = io()
 
-            <!-- ================================= -->
-            <!-- LISTA DE GRUPOS                   -->
-            <!-- ================================= -->
 
-            <div
-                id="groups"
-                class="groups-list"
-            >
+    const status =
+        document.getElementById(
+            'connection-status'
+        )
 
-                <div class="loading">
-                    Carregando grupos...
-                </div>
 
-            </div>
+    const dot =
+        document.getElementById(
+            'connection-dot'
+        )
 
-        </section>
 
+    const groupsContainer =
+        document.getElementById(
+            'groups'
+        )
 
 
-        <!-- ===================================== -->
-        <!-- DIVULGAÇÃO                            -->
-        <!-- ===================================== -->
+    const groupCount =
+        document.getElementById(
+            'group-count'
+        )
 
-        <section class="card composer-card">
 
-            <div class="card-header">
+    const logs =
+        document.getElementById(
+            'logs'
+        )
 
-                <div>
 
-                    <h2>
-                        Divulgação
-                    </h2>
+    const getGroupsButton =
+        document.getElementById(
+            'get-groups'
+        )
 
-                    <p>
-                        Escreva a mensagem que será enviada aos grupos selecionados.
-                    </p>
 
-                </div>
+    const disconnectButton =
+        document.getElementById(
+            'disconnect'
+        )
 
-            </div>
 
+    function log(message, data) {
 
+        const time =
+            new Date().toLocaleTimeString()
 
-            <!-- ================================= -->
-            <!-- MENSAGEM                           -->
-            <!-- ================================= -->
 
-            <div class="composer">
+        let text =
+            `[${time}] ${message}`
 
-                <label
-                    for="message"
-                    class="field-label"
-                >
-                    Mensagem da divulgação
-                </label>
 
+        if (data !== undefined) {
 
-                <textarea
-                    id="message"
-                    placeholder="Digite aqui a mensagem que deseja divulgar..."
-                    maxlength="4096"
-                ></textarea>
+            try {
 
+                text +=
+                    '\n' +
+                    JSON.stringify(
+                        data,
+                        null,
+                        2
+                    )
 
-                <div class="composer-footer">
+            } catch (error) {
 
-                    <span id="character-count">
-                        0 / 4096
-                    </span>
+                text +=
+                    '\n' +
+                    String(data)
 
-                </div>
+            }
 
-            </div>
+        }
 
 
+        logs.textContent +=
+            text +
+            '\n\n'
 
-            <!-- ================================= -->
-            <!-- RESUMO DO ENVIO                   -->
-            <!-- ================================= -->
 
-            <div class="send-area">
+        logs.scrollTop =
+            logs.scrollHeight
 
-                <div class="send-info">
 
-                    <strong id="send-target-count">
-                        0 grupos
-                    </strong>
+        console.log(
+            message,
+            data
+        )
+    }
 
-                    <span>
-                        receberão esta divulgação
-                    </span>
 
-                </div>
+    socket.on(
+        'connect',
+        () => {
 
+            status.textContent =
+                'Socket conectado'
 
-                <div class="send-buttons">
 
-                    <button
-                        id="cancel-send"
-                        class="button button-secondary"
-                        type="button"
-                        hidden
-                    >
-                        Cancelar envio
-                    </button>
+            dot.className =
+                'dot connected'
 
 
-                    <button
-                        id="send-message"
-                        class="button button-primary"
-                        type="button"
-                        disabled
-                    >
-                        Enviar divulgação
-                    </button>
+            log(
+                'Socket.IO conectado.'
+            )
 
-                </div>
 
-            </div>
+            log(
+                'Socket ID:',
+                socket.id
+            )
 
+        }
+    )
 
 
-            <!-- ================================= -->
-            <!-- PROGRESSO                          -->
-            <!-- ================================= -->
+    socket.on(
+        'disconnect',
+        reason => {
 
-            <div
-                id="progress-area"
-                class="progress-area"
-                hidden
-            >
+            status.textContent =
+                'Socket desconectado'
 
-                <div class="progress-header">
 
-                    <span>
-                        Enviando divulgação...
-                    </span>
+            dot.className =
+                'dot error'
 
 
-                    <span id="progress-text">
-                        0 / 0
-                    </span>
+            log(
+                'Socket.IO desconectado.',
+                reason
+            )
 
-                </div>
+        }
+    )
 
 
-                <div class="progress-bar">
+    socket.on(
+        'connect_error',
+        error => {
 
-                    <div
-                        id="progress-fill"
-                        class="progress-fill"
-                    ></div>
+            status.textContent =
+                'Erro de conexão'
 
-                </div>
 
+            dot.className =
+                'dot error'
 
-                <div
-                    id="send-status"
-                    class="send-status"
-                >
-                    Preparando envio...
-                </div>
 
-            </div>
+            log(
+                'CONNECT ERROR',
+                error.message
+            )
 
+        }
+    )
 
-            <!-- ================================= -->
-            <!-- COOLDOWN                           -->
-            <!-- ================================= -->
 
-            <div class="cooldown">
+    socket.on(
+        'auth-error',
+        data => {
 
-                <div>
+            log(
+                'AUTH ERROR',
+                data
+            )
 
-                    <span class="cooldown-title">
-                        Proteção de envio
-                    </span>
+        }
+    )
 
 
-                    <span class="cooldown-description">
-                        Os envios seguem o intervalo configurado no sistema.
-                    </span>
+    socket.on(
+        'whatsapp-state',
+        state => {
 
-                </div>
+            log(
+                'WHATSAPP-STATE RECEBIDO',
+                state
+            )
 
+        }
+    )
 
-                <div
-                    id="cooldown-status"
-                    class="cooldown-status"
-                >
-                    Pronto
-                </div>
 
-            </div>
+    socket.on(
+        'groups',
+        groups => {
 
-        </section>
+            log(
+                'EVENTO "groups" RECEBIDO',
+                groups
+            )
 
-    </section>
 
+            if (!Array.isArray(groups)) {
 
+                log(
+                    'ERRO: groups não é um Array.'
+                )
 
-    <!-- ========================================= -->
-    <!-- RODAPÉ                                   -->
-    <!-- ========================================= -->
+                return
 
-    <footer class="footer">
+            }
 
-        <span>
-            WhatsApp Broadcast
-        </span>
 
-    </footer>
+            groupCount.textContent =
+                groups.length
 
-</main>
 
+            groupsContainer.innerHTML = ''
 
 
-<!-- ========================================= -->
-<!-- SOCKET.IO                                 -->
-<!-- ========================================= -->
+            if (!groups.length) {
 
-<script
-    src="/socket.io/socket.io.js"
-></script>
+                groupsContainer.innerHTML = `
+                    <div class="empty">
+                        O servidor enviou 0 grupos.
+                    </div>
+                `
 
+                return
 
+            }
 
-<!-- ========================================= -->
-<!-- PAINEL                                    -->
-<!-- ========================================= -->
 
-<script
-    type="module"
-    src="/painel/js/panel.js"
-></script>
+            groups.forEach(
+                (group, index) => {
 
+                    const div =
+                        document.createElement(
+                            'div'
+                        )
+
+
+                    div.className =
+                        'group'
+
+
+                    const name =
+                        group?.name ||
+                        `Grupo ${index + 1}`
+
+
+                    const id =
+                        group?.id ||
+                        'ID não informado'
+
+
+                    div.innerHTML = `
+
+                        <div class="group-name">
+                            ${escapeHtml(name)}
+                        </div>
+
+                        <div class="group-id">
+                            ${escapeHtml(id)}
+                        </div>
+
+                    `
+
+
+                    groupsContainer.appendChild(
+                        div
+                    )
+
+                }
+            )
+
+        }
+    )
+
+
+    getGroupsButton.addEventListener(
+        'click',
+        () => {
+
+            log(
+                'BOTÃO "BUSCAR GRUPOS" CLICADO.'
+            )
+
+
+            log(
+                'Socket conectado:',
+                socket.connected
+            )
+
+
+            log(
+                'Socket ID:',
+                socket.id
+            )
+
+
+            /*
+             * IMPORTANTE:
+             *
+             * Estamos tentando descobrir
+             * qual evento o backend espera.
+             *
+             * Primeiro tentamos "get-groups".
+             */
+
+            socket.emit(
+                'get-groups'
+            )
+
+
+            log(
+                'Evento "get-groups" enviado para o servidor.'
+            )
+
+        }
+    )
+
+
+    disconnectButton.addEventListener(
+        'click',
+        () => {
+
+            log(
+                'BOTÃO DESCONectar CLICADO.'
+            )
+
+
+            socket.disconnect()
+
+        }
+    )
+
+
+    function escapeHtml(value) {
+
+        return String(value)
+
+            .replace(
+                /&/g,
+                '&amp;'
+            )
+
+            .replace(
+                /</g,
+                '&lt;'
+            )
+
+            .replace(
+                />/g,
+                '&gt;'
+            )
+
+            .replace(
+                /"/g,
+                '&quot;'
+            )
+
+            .replace(
+                /'/g,
+                '&#039;'
+            )
+
+    }
+
+</script>
 
 </body>
 
