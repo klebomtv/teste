@@ -1,7 +1,7 @@
 <!-- caminho: public/painel/index.html -->
 
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 
 <head>
 
@@ -12,7 +12,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Teste de Grupos</title>
+    <title>WhatsApp Broadcast</title>
 
     <style>
 
@@ -194,6 +194,34 @@
             border-color: #111;
         }
 
+        .settings {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f4f5f7;
+        }
+
+        .settings label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        #delay {
+            width: 100px;
+            padding: 9px 10px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        .delay-description {
+            color: #666;
+            font-size: 13px;
+        }
+
         .send-area {
             display: flex;
             align-items: center;
@@ -248,10 +276,10 @@
 
     <h1>W</h1>
 
-    <h2>Teste de Grupos</h2>
+    <h2>WhatsApp Broadcast</h2>
 
     <div class="subtitle">
-        Página simplificada para testar grupos e divulgação.
+        Select groups and send a broadcast message.
     </div>
 
 
@@ -265,7 +293,7 @@
             ></span>
 
             <strong id="connection-status">
-                Conectando...
+                Connecting...
             </strong>
 
         </div>
@@ -276,7 +304,7 @@
             class="primary"
             type="button"
         >
-            Buscar grupos
+            Get Groups
         </button>
 
 
@@ -285,7 +313,7 @@
             class="secondary"
             type="button"
         >
-            Desconectar
+            Disconnect
         </button>
 
     </div>
@@ -293,7 +321,7 @@
 
     <div class="card">
 
-        <h3>Grupos</h3>
+        <h3>Groups</h3>
 
         <div>
             Total:
@@ -311,7 +339,7 @@
                 >
 
                 <span>
-                    Selecionar todos
+                    Select All
                 </span>
 
             </label>
@@ -321,7 +349,7 @@
                 id="selected-count"
                 class="selected-count"
             >
-                0 selecionados
+                0 selected
             </span>
 
         </div>
@@ -330,7 +358,7 @@
         <div id="groups">
 
             <div class="empty">
-                Nenhum grupo recebido.
+                No groups received.
             </div>
 
         </div>
@@ -339,15 +367,15 @@
 
 
     <!-- ===================================== -->
-    <!-- DIVULGAÇÃO                            -->
+    <!-- BROADCAST                             -->
     <!-- ===================================== -->
 
     <div class="card">
 
-        <h3>Divulgação</h3>
+        <h3>Broadcast</h3>
 
         <p class="subtitle">
-            Escreva a mensagem e selecione os grupos que receberão o envio.
+            Write your message and select the groups that will receive it.
         </p>
 
 
@@ -355,15 +383,43 @@
             class="message-label"
             for="message"
         >
-            Mensagem
+            Message
         </label>
 
 
         <textarea
             id="message"
             maxlength="4096"
-            placeholder="Digite aqui a mensagem da divulgação..."
+            placeholder="Type your broadcast message..."
         ></textarea>
+
+
+        <!-- ================================= -->
+        <!-- DELAY                              -->
+        <!-- ================================= -->
+
+        <div class="settings">
+
+            <label for="delay">
+                Delay between groups:
+            </label>
+
+
+            <input
+                id="delay"
+                type="number"
+                min="0"
+                max="3600"
+                step="1"
+                value="3"
+            >
+
+
+            <span class="delay-description">
+                seconds
+            </span>
+
+        </div>
 
 
         <div class="send-area">
@@ -371,11 +427,11 @@
             <div class="send-info">
 
                 <strong id="send-target-count">
-                    0 grupos
+                    0 groups
                 </strong>
 
                 <div>
-                    selecionados para envio
+                    selected for delivery
                 </div>
 
             </div>
@@ -389,7 +445,7 @@
                     type="button"
                     disabled
                 >
-                    Enviar divulgação
+                    Send Broadcast
                 </button>
 
 
@@ -399,7 +455,7 @@
                     type="button"
                     disabled
                 >
-                    Cancelar
+                    Cancel
                 </button>
 
             </div>
@@ -408,7 +464,7 @@
 
 
         <div id="send-status">
-            Aguardando mensagem.
+            Waiting for a message.
         </div>
 
     </div>
@@ -496,6 +552,12 @@
     const messageInput =
         document.getElementById(
             'message'
+        )
+
+
+    const delayInput =
+        document.getElementById(
+            'delay'
         )
 
 
@@ -589,23 +651,23 @@
 
     function updateSelection() {
 
-        const selectedGroups =
+        const groupIds =
             getSelectedGroups()
 
 
         const selected =
-            selectedGroups.length
+            groupIds.length
 
 
         selectedCount.textContent =
-            `${selected} selecionados`
+            `${selected} selected`
 
 
         sendTargetCount.textContent =
             `${selected} ${
                 selected === 1
-                    ? 'grupo'
-                    : 'grupos'
+                    ? 'group'
+                    : 'groups'
             }`
 
 
@@ -625,12 +687,12 @@
 
 
         log(
-            'SELEÇÃO ATUALIZADA',
+            'SELECTION UPDATED',
             {
-                quantidade:
+                count:
                     selected,
-                grupos:
-                    selectedGroups
+                groups:
+                    groupIds
             }
         )
 
@@ -639,7 +701,7 @@
 
     function updateSendButton() {
 
-        const selectedGroups =
+        const groupIds =
             getSelectedGroups()
 
 
@@ -649,7 +711,7 @@
 
         sendButton.disabled =
             !socket.connected ||
-            selectedGroups.length === 0 ||
+            groupIds.length === 0 ||
             message.length === 0 ||
             sending
 
@@ -659,7 +721,7 @@
     function renderGroups(groups) {
 
         log(
-            'RENDERIZANDO GRUPOS',
+            'RENDERING GROUPS',
             groups
         )
 
@@ -667,7 +729,7 @@
         if (!Array.isArray(groups)) {
 
             log(
-                'ERRO: groups não é um Array.'
+                'ERROR: groups is not an Array.'
             )
 
             return
@@ -690,7 +752,7 @@
 
             groupsContainer.innerHTML = `
                 <div class="empty">
-                    O servidor enviou 0 grupos.
+                    The server returned 0 groups.
                 </div>
             `
 
@@ -716,7 +778,7 @@
 
                 const name =
                     group?.name ||
-                    `Grupo ${index + 1}`
+                    `Group ${index + 1}`
 
 
                 const id =
@@ -775,9 +837,9 @@
 
 
         log(
-            'GRUPOS RENDERIZADOS',
+            'GROUPS RENDERED',
             {
-                quantidade:
+                count:
                     groups.length
             }
         )
@@ -790,7 +852,7 @@
         () => {
 
             status.textContent =
-                'Socket conectado'
+                'Socket connected'
 
 
             dot.className =
@@ -798,7 +860,7 @@
 
 
             log(
-                'Socket.IO conectado.'
+                'Socket.IO connected.'
             )
 
 
@@ -819,7 +881,7 @@
         reason => {
 
             status.textContent =
-                'Socket desconectado'
+                'Socket disconnected'
 
 
             dot.className =
@@ -827,7 +889,7 @@
 
 
             log(
-                'Socket.IO desconectado.',
+                'Socket.IO disconnected.',
                 reason
             )
 
@@ -843,7 +905,7 @@
         error => {
 
             status.textContent =
-                'Erro de conexão'
+                'Connection error'
 
 
             dot.className =
@@ -880,18 +942,10 @@
         state => {
 
             log(
-                'WHATSAPP-STATE RECEBIDO',
+                'WHATSAPP-STATE RECEIVED',
                 state
             )
 
-
-            /*
-             * O backend já envia os grupos
-             * dentro do whatsapp-state.
-             *
-             * Portanto podemos renderizar
-             * diretamente daqui.
-             */
 
             if (
                 state &&
@@ -915,7 +969,7 @@
         groups => {
 
             log(
-                'EVENTO "groups" RECEBIDO',
+                'GROUPS EVENT RECEIVED',
                 groups
             )
 
@@ -933,12 +987,12 @@
         () => {
 
             log(
-                'BOTÃO "BUSCAR GRUPOS" CLICADO.'
+                'GET GROUPS BUTTON CLICKED.'
             )
 
 
             log(
-                'Socket conectado:',
+                'Socket connected:',
                 socket.connected
             )
 
@@ -955,7 +1009,7 @@
 
 
             log(
-                'Evento "get-groups" enviado para o servidor.'
+                'get-groups event sent.'
             )
 
         }
@@ -998,16 +1052,35 @@
     )
 
 
+    delayInput.addEventListener(
+        'input',
+        () => {
+
+            const value =
+                Number(
+                    delayInput.value
+                )
+
+
+            log(
+                'DELAY UPDATED:',
+                value
+            )
+
+        }
+    )
+
+
     /*
      * =====================================
-     * FUNÇÃO DE ENVIO
+     * SEND BROADCAST
      * =====================================
      */
 
     function sendMessage() {
 
         log(
-            'BOTÃO "ENVIAR DIVULGAÇÃO" CLICADO.'
+            'SEND BROADCAST BUTTON CLICKED.'
         )
 
 
@@ -1019,26 +1092,48 @@
             messageInput.value.trim()
 
 
+        let delay =
+            Number(
+                delayInput.value
+            )
+
+
+        if (
+            !Number.isFinite(delay) ||
+            delay < 0
+        ) {
+
+            delay = 3
+
+        }
+
+
         log(
-            'GRUPOS SELECIONADOS:',
+            'SELECTED GROUPS:',
             groupIds
         )
 
 
         log(
-            'MENSAGEM:',
+            'MESSAGE:',
             message
+        )
+
+
+        log(
+            'DELAY:',
+            `${delay} seconds`
         )
 
 
         if (!socket.connected) {
 
-            log(
-                'ERRO: Socket desconectado.'
-            )
-
             sendStatus.textContent =
-                'Erro: conexão com o servidor não está disponível.'
+                'Error: socket is not connected.'
+
+            log(
+                'ERROR: Socket disconnected.'
+            )
 
             return
 
@@ -1048,10 +1143,10 @@
         if (!groupIds.length) {
 
             sendStatus.textContent =
-                'Selecione pelo menos um grupo.'
+                'Select at least one group.'
 
             log(
-                'ERRO: nenhum grupo selecionado.'
+                'ERROR: No groups selected.'
             )
 
             return
@@ -1062,10 +1157,10 @@
         if (!message) {
 
             sendStatus.textContent =
-                'Digite uma mensagem.'
+                'Enter a message.'
 
             log(
-                'ERRO: mensagem vazia.'
+                'ERROR: Empty message.'
             )
 
             return
@@ -1076,7 +1171,7 @@
         if (sending) {
 
             log(
-                'ENVIO JÁ ESTÁ EM ANDAMENTO.'
+                'SEND ALREADY IN PROGRESS.'
             )
 
             return
@@ -1092,7 +1187,7 @@
 
 
         sendStatus.textContent =
-            `Enviando para ${groupIds.length} grupos...`
+            `Sending to ${groupIds.length} groups...`
 
 
         const data = {
@@ -1101,13 +1196,16 @@
                 groupIds,
 
             message:
-                message
+                message,
+
+            delay:
+                delay
 
         }
 
 
         log(
-            'ENVIANDO EVENTO "send-message"',
+            'SENDING send-message:',
             data
         )
 
@@ -1119,7 +1217,7 @@
 
 
         log(
-            'EVENTO "send-message" ENVIADO.'
+            'send-message EVENT SENT.'
         )
 
     }
@@ -1133,7 +1231,7 @@
 
     /*
      * =====================================
-     * CANCELAR ENVIO
+     * CANCEL SEND
      * =====================================
      */
 
@@ -1142,7 +1240,7 @@
         () => {
 
             log(
-                'BOTÃO "CANCELAR" CLICADO.'
+                'CANCEL BUTTON CLICKED.'
             )
 
 
@@ -1152,7 +1250,7 @@
 
 
             sendStatus.textContent =
-                'Solicitação de cancelamento enviada.'
+                'Cancellation request sent.'
 
         }
     )
@@ -1160,7 +1258,7 @@
 
     /*
      * =====================================
-     * RESULTADO DO ENVIO
+     * SEND RESULTS
      * =====================================
      */
 
@@ -1169,7 +1267,7 @@
         data => {
 
             log(
-                'SEND-RESULT RECEBIDO',
+                'SEND-RESULT RECEIVED',
                 data
             )
 
@@ -1187,23 +1285,10 @@
 
                 sendStatus.textContent =
                     data.message ||
-                    'Erro ao enviar mensagem.'
+                    'Error sending message.'
 
 
                 updateSendButton()
-
-                return
-
-            }
-
-
-            if (
-                data &&
-                data.success === true
-            ) {
-
-                sendStatus.textContent =
-                    'Envio concluído.'
 
             }
 
@@ -1216,7 +1301,7 @@
         data => {
 
             log(
-                'SEND-STARTED RECEBIDO',
+                'SEND-STARTED RECEIVED',
                 data
             )
 
@@ -1229,7 +1314,7 @@
         data => {
 
             log(
-                'SEND-PROGRESS RECEBIDO',
+                'SEND-PROGRESS RECEIVED',
                 data
             )
 
@@ -1250,7 +1335,7 @@
             if (total > 0) {
 
                 sendStatus.textContent =
-                    `Enviando ${current} de ${total}: ${
+                    `Sending ${current} of ${total}: ${
                         data.group || ''
                     }`
 
@@ -1265,7 +1350,7 @@
         data => {
 
             log(
-                'SEND-FINISHED RECEBIDO',
+                'SEND-FINISHED RECEIVED',
                 data
             )
 
@@ -1278,7 +1363,7 @@
 
 
             sendStatus.textContent =
-                'Envio concluído.'
+                'Broadcast completed.'
 
 
             updateSendButton()
@@ -1292,7 +1377,7 @@
         data => {
 
             log(
-                'SEND-CANCELLED RECEBIDO',
+                'SEND-CANCELLED RECEIVED',
                 data
             )
 
@@ -1305,7 +1390,7 @@
 
 
             sendStatus.textContent =
-                'Envio cancelado.'
+                'Broadcast cancelled.'
 
 
             updateSendButton()
@@ -1319,7 +1404,7 @@
         data => {
 
             log(
-                'CANCEL-RESULT RECEBIDO',
+                'CANCEL-RESULT RECEIVED',
                 data
             )
 
@@ -1332,7 +1417,7 @@
         () => {
 
             log(
-                'BOTÃO "DESCONECTAR" CLICADO.'
+                'DISCONNECT BUTTON CLICKED.'
             )
 
 
