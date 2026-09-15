@@ -35,7 +35,7 @@ async function sendCode(email, code) {
         to: email,
 
         subject:
-            'Código de acesso - WhatsApp Bot',
+            'Código de acesso - WhatsApp Tool',
 
         text:
             `Seu código de acesso é: ${code}\n\n` +
@@ -44,7 +44,7 @@ async function sendCode(email, code) {
 
         html: `
             <div style="font-family: Arial, sans-serif;">
-                <h2>WhatsApp Bot</h2>
+                <h2>WhatsApp Tool</h2>
 
                 <p>
                     Seu código de acesso é:
