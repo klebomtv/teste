@@ -1,7 +1,7 @@
-<!-- caminho: public/painel/index.html -->
+// caminho: public/painel/index.html
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
 
@@ -12,8 +12,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Broadcast Panel</title>
-
+    <title>WhatsApp Broadcast</title>
 
     <link
         rel="stylesheet"
@@ -29,11 +28,10 @@
 
 
     <!-- ========================================= -->
-    <!-- HEADER                                    -->
+    <!-- CABEÇALHO                                 -->
     <!-- ========================================= -->
 
     <header class="header">
-
 
         <div class="brand">
 
@@ -41,15 +39,14 @@
                 W
             </div>
 
-
             <div>
 
                 <h1>
-                    Broadcast
+                    WhatsApp Broadcast
                 </h1>
 
                 <span>
-                    WhatsApp messaging panel
+                    Painel de divulgação
                 </span>
 
             </div>
@@ -59,7 +56,6 @@
 
         <div class="connection">
 
-
             <span
                 id="connection-dot"
                 class="connection-dot"
@@ -67,7 +63,7 @@
 
 
             <span id="connection-status">
-                Connecting...
+                Conectando...
             </span>
 
 
@@ -76,43 +72,38 @@
                 class="button button-secondary"
                 type="button"
             >
-                Disconnect
+                Desconectar
             </button>
 
-
         </div>
-
 
     </header>
 
 
 
     <!-- ========================================= -->
-    <!-- WORKSPACE                                 -->
+    <!-- ÁREA PRINCIPAL                            -->
     <!-- ========================================= -->
 
     <section class="workspace">
 
 
         <!-- ===================================== -->
-        <!-- GROUPS                                -->
+        <!-- GRUPOS                                -->
         <!-- ===================================== -->
 
         <section class="card groups-card">
 
-
             <div class="card-header">
-
 
                 <div>
 
                     <h2>
-                        Groups
+                        Grupos
                     </h2>
 
-
                     <p>
-                        Select where you want to send your message.
+                        Selecione os grupos que receberão a divulgação.
                     </p>
 
                 </div>
@@ -125,31 +116,26 @@
                     0
                 </span>
 
-
             </div>
 
 
 
             <!-- ================================= -->
-            <!-- GROUP ACTIONS                     -->
+            <!-- CONTROLES DOS GRUPOS              -->
             <!-- ================================= -->
 
             <div class="group-actions">
 
-
                 <label class="select-all">
-
 
                     <input
                         type="checkbox"
                         id="select-all"
                     >
 
-
                     <span>
-                        Select all
+                        Selecionar todos
                     </span>
-
 
                 </label>
 
@@ -158,16 +144,15 @@
                     id="selected-count"
                     class="selected-count"
                 >
-                    0 selected
+                    0 selecionados
                 </span>
-
 
             </div>
 
 
 
             <!-- ================================= -->
-            <!-- GROUP LIST                        -->
+            <!-- LISTA DE GRUPOS                   -->
             <!-- ================================= -->
 
             <div
@@ -176,142 +161,92 @@
             >
 
                 <div class="loading">
-                    Loading groups...
+                    Carregando grupos...
                 </div>
 
             </div>
-
 
         </section>
 
 
 
         <!-- ===================================== -->
-        <!-- MESSAGE                               -->
+        <!-- DIVULGAÇÃO                            -->
         <!-- ===================================== -->
 
         <section class="card composer-card">
 
-
             <div class="card-header">
-
 
                 <div>
 
                     <h2>
-                        Message
+                        Divulgação
                     </h2>
 
-
                     <p>
-                        Compose the message you want to broadcast.
+                        Escreva a mensagem que será enviada aos grupos selecionados.
                     </p>
 
                 </div>
-
 
             </div>
 
 
 
             <!-- ================================= -->
-            <!-- COMPOSER                           -->
+            <!-- MENSAGEM                           -->
             <!-- ================================= -->
 
             <div class="composer">
-
 
                 <label
                     for="message"
                     class="field-label"
                 >
-                    Message
+                    Mensagem da divulgação
                 </label>
 
 
                 <textarea
                     id="message"
-                    placeholder="Write your message here..."
+                    placeholder="Digite aqui a mensagem que deseja divulgar..."
                     maxlength="4096"
                 ></textarea>
 
 
                 <div class="composer-footer">
 
-
                     <span id="character-count">
                         0 / 4096
                     </span>
 
-
                 </div>
-
 
             </div>
 
 
 
             <!-- ================================= -->
-            <!-- COOLDOWN                           -->
-            <!-- ================================= -->
-
-            <div class="cooldown">
-
-
-                <div>
-
-
-                    <span class="cooldown-title">
-                        Sending protection
-                    </span>
-
-
-                    <span class="cooldown-description">
-                        Messages are sent using the configured cooldown.
-                    </span>
-
-
-                </div>
-
-
-                <div
-                    id="cooldown-status"
-                    class="cooldown-status"
-                >
-                    Ready
-                </div>
-
-
-            </div>
-
-
-
-            <!-- ================================= -->
-            <!-- SEND AREA                          -->
+            <!-- RESUMO DO ENVIO                   -->
             <!-- ================================= -->
 
             <div class="send-area">
 
-
                 <div class="send-info">
 
-
                     <strong id="send-target-count">
-                        0 groups
+                        0 grupos
                     </strong>
 
-
                     <span>
-                        selected for delivery
+                        receberão esta divulgação
                     </span>
-
 
                 </div>
 
 
-
                 <div class="send-buttons">
-
 
                     <button
                         id="cancel-send"
@@ -319,9 +254,8 @@
                         type="button"
                         hidden
                     >
-                        Cancel
+                        Cancelar envio
                     </button>
-
 
 
                     <button
@@ -330,19 +264,17 @@
                         type="button"
                         disabled
                     >
-                        Send message
+                        Enviar divulgação
                     </button>
 
-
                 </div>
-
 
             </div>
 
 
 
             <!-- ================================= -->
-            <!-- PROGRESS                           -->
+            <!-- PROGRESSO                          -->
             <!-- ================================= -->
 
             <div
@@ -351,12 +283,10 @@
                 hidden
             >
 
-
                 <div class="progress-header">
 
-
                     <span>
-                        Sending...
+                        Enviando divulgação...
                     </span>
 
 
@@ -364,56 +294,75 @@
                         0 / 0
                     </span>
 
-
                 </div>
 
 
-
                 <div class="progress-bar">
-
 
                     <div
                         id="progress-fill"
                         class="progress-fill"
                     ></div>
 
-
                 </div>
-
 
 
                 <div
                     id="send-status"
                     class="send-status"
                 >
-                    Preparing delivery...
+                    Preparando envio...
                 </div>
-
 
             </div>
 
 
-        </section>
+            <!-- ================================= -->
+            <!-- COOLDOWN                           -->
+            <!-- ================================= -->
 
+            <div class="cooldown">
+
+                <div>
+
+                    <span class="cooldown-title">
+                        Proteção de envio
+                    </span>
+
+
+                    <span class="cooldown-description">
+                        Os envios seguem o intervalo configurado no sistema.
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="cooldown-status"
+                    class="cooldown-status"
+                >
+                    Pronto
+                </div>
+
+            </div>
+
+        </section>
 
     </section>
 
 
 
     <!-- ========================================= -->
-    <!-- FOOTER                                    -->
+    <!-- RODAPÉ                                   -->
     <!-- ========================================= -->
 
     <footer class="footer">
-
 
         <span>
             WhatsApp Broadcast
         </span>
 
-
     </footer>
-
 
 </main>
 
