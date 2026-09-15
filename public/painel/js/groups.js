@@ -2,8 +2,6 @@
 
 let availableGroups = []
 
-let socketConnected = false
-
 
 const groupsContainer =
     document.getElementById(
@@ -29,6 +27,11 @@ const selectAll =
     )
 
 
+console.log(
+    '[GROUPS] Módulo groups.js carregado.'
+)
+
+
 /*
  * ==========================================
  * CONEXÃO
@@ -39,8 +42,10 @@ export function updateGroupsConnection(
     connected
 ) {
 
-    socketConnected =
+    console.log(
+        '[GROUPS] Estado da conexão:',
         connected
+    )
 
 }
 
@@ -55,26 +60,72 @@ function renderGroups(
     groups
 ) {
 
+    console.log(
+        '[GROUPS] Renderizando grupos:',
+        groups
+    )
+
+
+    if (
+        !Array.isArray(groups)
+    ) {
+
+        console.error(
+            '[GROUPS] ERRO: groups não é um array.',
+            groups
+        )
+
+        return
+
+    }
+
+
     availableGroups =
-        Array.isArray(groups)
-            ? groups
-            : []
+        groups
 
 
-    groupCount.textContent =
-        availableGroups.length
+    /*
+     * Atualiza contador.
+     */
+
+    if (groupCount) {
+
+        groupCount.textContent =
+            availableGroups.length
+
+    }
 
 
-    groupsContainer.innerHTML =
-        ''
+    /*
+     * Limpa lista atual.
+     */
 
+    if (groupsContainer) {
+
+        groupsContainer.innerHTML = ''
+
+    }
+
+
+    /*
+     * Nenhum grupo.
+     */
 
     if (
         availableGroups.length === 0
     ) {
 
-        groupsContainer.innerHTML =
-            '<div class="loading">Nenhum grupo encontrado.</div>'
+        if (groupsContainer) {
+
+            groupsContainer.innerHTML = `
+
+                <div class="loading">
+                    Nenhum grupo encontrado.
+                </div>
+
+            `
+
+        }
 
 
         updateSelection()
@@ -83,6 +134,10 @@ function renderGroups(
 
     }
 
+
+    /*
+     * Cria cada grupo.
+     */
 
     availableGroups.forEach(
         (group, index) => {
@@ -112,7 +167,7 @@ function renderGroups(
 
 
             checkbox.value =
-                group.id
+                group.id || ''
 
 
             checkbox.dataset.index =
@@ -156,27 +211,10 @@ function renderGroups(
 
     updateSelection()
 
-}
-
-
-/*
- * ==========================================
- * GRUPOS RECEBIDOS
- * ==========================================
- */
-
-function handleGroups(
-    groups
-) {
 
     console.log(
-        '[GROUPS] Grupos recebidos:',
-        groups
-    )
-
-
-    renderGroups(
-        groups
+        '[GROUPS] Grupos renderizados:',
+        availableGroups.length
     )
 
 }
@@ -184,7 +222,7 @@ function handleGroups(
 
 /*
  * ==========================================
- * ESTADO DO WHATSAPP
+ * WHATSAPP STATE
  * ==========================================
  */
 
@@ -193,18 +231,42 @@ function handleWhatsappState(
 ) {
 
     console.log(
-        '[GROUPS] Estado recebido:',
+        '[GROUPS] WHATSAPP-STATE recebido:',
         state
     )
 
 
+    if (!state) {
+
+        console.error(
+            '[GROUPS] State vazio.'
+        )
+
+        return
+
+    }
+
+
+    console.log(
+        '[GROUPS] state.groups:',
+        state.groups
+    )
+
+
     if (
-        state &&
-        Array.isArray(state.groups)
+        Array.isArray(
+            state.groups
+        )
     ) {
 
         renderGroups(
             state.groups
+        )
+
+    } else {
+
+        console.warn(
+            '[GROUPS] state.groups não é um array.'
         )
 
     }
@@ -248,9 +310,21 @@ function updateSelection() {
         availableGroups.length
 
 
-    selectedCount.textContent =
-        `${selected.length} selected`
+    /*
+     * Contador principal.
+     */
 
+    if (selectedCount) {
+
+        selectedCount.textContent =
+            `${selected.length} selected`
+
+    }
+
+
+    /*
+     * Contador da área de envio.
+     */
 
     const sendTargetCount =
         document.getElementById(
@@ -270,15 +344,27 @@ function updateSelection() {
     }
 
 
-    selectAll.checked =
-        total > 0 &&
-        selected.length === total
+    /*
+     * Select all.
+     */
+
+    if (selectAll) {
+
+        selectAll.checked =
+            total > 0 &&
+            selected.length === total
 
 
-    selectAll.indeterminate =
-        selected.length > 0 &&
-        selected.length < total
+        selectAll.indeterminate =
+            selected.length > 0 &&
+            selected.length < total
 
+    }
+
+
+    /*
+     * Informa o messages.js.
+     */
 
     document.dispatchEvent(
         new CustomEvent(
@@ -295,30 +381,40 @@ function updateSelection() {
  * ==========================================
  */
 
-selectAll.addEventListener(
-    'change',
-    () => {
+if (selectAll) {
 
-        const checkboxes =
-            document.querySelectorAll(
-                '.group-checkbox'
+    selectAll.addEventListener(
+        'change',
+        () => {
+
+            console.log(
+                '[GROUPS] Select all:',
+                selectAll.checked
             )
 
 
-        checkboxes.forEach(
-            checkbox => {
-
-                checkbox.checked =
-                    selectAll.checked
-
-            }
-        )
+            const checkboxes =
+                document.querySelectorAll(
+                    '.group-checkbox'
+                )
 
 
-        updateSelection()
+            checkboxes.forEach(
+                checkbox => {
 
-    }
-)
+                    checkbox.checked =
+                        selectAll.checked
+
+                }
+            )
+
+
+            updateSelection()
+
+        }
+    )
+
+}
 
 
 /*
@@ -331,15 +427,35 @@ export function setupGroups(
     socket
 ) {
 
-    socket.on(
-        'groups',
-        handleGroups
+    console.log(
+        '[GROUPS] Configurando módulo...'
     )
 
+
+    if (!socket) {
+
+        console.error(
+            '[GROUPS] Socket não recebido.'
+        )
+
+        return
+
+    }
+
+
+    /*
+     * O backend atual envia os grupos
+     * dentro de whatsapp-state.
+     */
 
     socket.on(
         'whatsapp-state',
         handleWhatsappState
+    )
+
+
+    console.log(
+        '[GROUPS] Listener whatsapp-state registrado.'
     )
 
 }

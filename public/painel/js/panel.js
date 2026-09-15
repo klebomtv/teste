@@ -5,13 +5,20 @@ import {
     updateGroupsConnection
 } from './groups.js'
 
+
 import {
     setupMessages,
     updateMessagesConnection
 } from './messages.js'
 
 
-const socket = io()
+console.log(
+    '[PANEL] panel.js carregado.'
+)
+
+
+const socket =
+    io()
 
 
 const connectionStatus =
@@ -26,9 +33,31 @@ const connectionDot =
     )
 
 
+const disconnectButton =
+    document.getElementById(
+        'disconnect'
+    )
+
+
 /*
  * ==========================================
- * CONEXÃO
+ * CONFIGURAR MÓDULOS
+ * ==========================================
+ */
+
+setupGroups(
+    socket
+)
+
+
+setupMessages(
+    socket
+)
+
+
+/*
+ * ==========================================
+ * STATUS DA CONEXÃO
  * ==========================================
  */
 
@@ -41,6 +70,7 @@ function setConnectionStatus(
         connectionStatus.textContent =
             'Connected'
 
+
         connectionDot.classList.add(
             'connected'
         )
@@ -49,6 +79,7 @@ function setConnectionStatus(
 
         connectionStatus.textContent =
             'Disconnected'
+
 
         connectionDot.classList.remove(
             'connected'
@@ -80,13 +111,13 @@ socket.on(
     () => {
 
         console.log(
-            '[PAINEL] Socket conectado:',
+            '[PANEL] Socket conectado:',
             socket.id
         )
 
 
         console.log(
-            '[PAINEL] Transport:',
+            '[PANEL] Transport:',
             socket.io.engine.transport.name
         )
 
@@ -109,8 +140,8 @@ socket.on(
     'disconnect',
     reason => {
 
-        console.error(
-            '[PAINEL] Socket desconectado:',
+        console.warn(
+            '[PANEL] Socket desconectado:',
             reason
         )
 
@@ -134,7 +165,7 @@ socket.on(
     error => {
 
         console.error(
-            '[PAINEL] Erro Socket.IO:',
+            '[PANEL] Erro Socket.IO:',
             error
         )
 
@@ -157,7 +188,7 @@ socket.on(
     data => {
 
         console.error(
-            '[PAINEL] Erro de autenticação:',
+            '[PANEL] Erro de autenticação:',
             data
         )
 
@@ -171,15 +202,30 @@ socket.on(
 
 /*
  * ==========================================
- * INICIALIZAÇÃO DOS MÓDULOS
+ * DISCONNECT
  * ==========================================
+ *
+ * Por enquanto este botão desconecta
+ * somente o Socket.IO do painel.
+ *
+ * NÃO desconecta o WhatsApp.
+ *
  */
 
-setupGroups(
-    socket
-)
+if (disconnectButton) {
+
+    disconnectButton.addEventListener(
+        'click',
+        () => {
+
+            console.log(
+                '[PANEL] Botão Disconnect clicado.'
+            )
 
 
-setupMessages(
-    socket
-)
+            socket.disconnect()
+
+        }
+    )
+
+}
