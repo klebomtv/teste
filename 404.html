@@ -1,0 +1,55 @@
+
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Página não encontrada | 1st Stands</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <main class="error-page">
+    <a class="brand" href="/" aria-label="1st Stands - início">
+      <span class="brand-mark">1ST</span>
+      <span class="brand-name">STANDS<span class="brand-dot">.</span></span>
+    </a>
+
+    <div class="error-content">
+      <span class="error-code">404</span>
+
+      <p class="eyebrow dark-eyebrow">
+        OPS! <span class="eyebrow-line"></span>
+      </p>
+
+      <h1>Esta página não foi encontrada<span>.</span></h1>
+
+      <p>
+        O endereço que você tentou acessar não existe ou foi removido.
+        Mas podemos ajudar você a encontrar o caminho de volta.
+      </p>
+
+      <a class="button" href="/">
+        Voltar para a página inicial
+        <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+
+    <span class="error-footer">
+      © <span id="current-year"></span> 1st Stands. Todos os direitos reservados.
+    </span>
+  </main>
+
+  <script>
+    document.querySelector("#current-year").textContent =
+      new Date().getFullYear();
+  </script>
+
+</body>
+</html>
