@@ -1,6 +1,6 @@
 // Caminho: js/main.js
 // Atualize o telefone abaixo com o WhatsApp oficial da 1st Stands.
-const WHATSAPP_PHONE = "5511999999999";
+const WHATSAPP_PHONE = "5511961303203";
 const WHATSAPP_MESSAGE = "Olá! Gostaria de solicitar um orçamento para um stand.";
 
 function setupWhatsAppLinks() {
