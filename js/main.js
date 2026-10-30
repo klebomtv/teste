@@ -4,7 +4,6 @@
 const WHATSAPP_PHONE = "5511961303203";
 const WHATSAPP_MESSAGE = "Olá! Gostaria de solicitar um orçamento para um stand.";
 
-// WhatsApp
 function setupWhatsAppLinks() {
   const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
@@ -15,7 +14,6 @@ function setupWhatsAppLinks() {
   });
 }
 
-// Carrossel da página inicial
 function setupCarousel() {
   const slides = [...document.querySelectorAll(".hero-slide")];
   const dots = [...document.querySelectorAll("[data-slide]")];
@@ -52,12 +50,8 @@ function setupCarousel() {
 
   dots.forEach((dot) => {
     dot.addEventListener("click", () => {
-      const index = Number(dot.dataset.slide);
-
-      if (index < slides.length) {
-        showSlide(index);
-        restartTimer();
-      }
+      showSlide(Number(dot.dataset.slide));
+      restartTimer();
     });
   });
 
@@ -65,7 +59,6 @@ function setupCarousel() {
   restartTimer();
 }
 
-// Menu mobile
 function setupMobileMenu() {
   const toggle = document.querySelector(".menu-toggle");
   const nav = document.querySelector(".main-nav");
@@ -88,7 +81,6 @@ function setupMobileMenu() {
   });
 }
 
-// Ano atual do rodapé
 function setCurrentYear() {
   const year = document.querySelector("#current-year");
 
@@ -97,7 +89,6 @@ function setCurrentYear() {
   }
 }
 
-// Portfólio
 async function setupPortfolio() {
   const gallery = document.querySelector("#portfolio-grid");
 
@@ -107,17 +98,13 @@ async function setupPortfolio() {
     const response = await fetch("photos.json");
 
     if (!response.ok) {
-      throw new Error("Não foi possível carregar photos.json.");
+      throw new Error("Não foi possível carregar a lista de fotos.");
     }
 
     const photos = await response.json();
 
-    if (!Array.isArray(photos) || photos.length === 0) {
-      gallery.innerHTML = `
-        <p class="portfolio-message">
-          Nenhum projeto encontrado.
-        </p>
-      `;
+    if (!photos.length) {
+      gallery.innerHTML = '<p class="portfolio-message">Nenhum projeto encontrado.</p>';
       return;
     }
 
@@ -125,32 +112,16 @@ async function setupPortfolio() {
       <article class="portfolio-card">
         <img
           src="${photo.src}"
-          alt="${photo.title || "Projeto 1st Stands"}"
+          alt="${photo.title}"
           loading="lazy"
         >
 
         <div class="portfolio-card-info">
-          <h2>${photo.title || "Projeto 1st Stands"}</h2>
-          <p>${photo.description || "Projeto desenvolvido pela equipe 1st Stands."}</p>
+          <h2>${photo.title}</h2>
+          <p>${photo.description}</p>
         </div>
       </article>
     `).join("");
-
-    // Remove cards cujas imagens não foram encontradas (404)
-    gallery.querySelectorAll(".portfolio-card img").forEach((image) => {
-      image.addEventListener("error", () => {
-        image.closest(".portfolio-card")?.remove();
-
-        // Exibe mensagem caso todas as imagens falhem
-        if (!gallery.querySelector(".portfolio-card")) {
-          gallery.innerHTML = `
-            <p class="portfolio-message">
-              Nenhum projeto disponível no momento.
-            </p>
-          `;
-        }
-      }, { once: true });
-    });
 
   } catch (error) {
     console.error("Erro no portfólio:", error);
@@ -163,7 +134,6 @@ async function setupPortfolio() {
   }
 }
 
-// Inicialização
 document.addEventListener("DOMContentLoaded", () => {
   setupWhatsAppLinks();
   setupCarousel();
