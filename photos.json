@@ -1,72 +1,67 @@
 ﻿[
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand Lightbury",
+        "description":  "Stand Apresentado na FISP 2026, São Paulo Expo.",
         "src":  "photos/1.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand Mundo Linha vida",
+        "description":  "Stand Apresentado na FISP 2026, São Paulo Expo.",
         "src":  "photos/2.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand W Bertolo",
+        "description":  "Stand apresentado na FEICON 2026, São Paulo Expo.",
         "src":  "photos/3.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand Top Cintos",
+        "description":  "Stand Apresentado na FISP 2026, São Paulo Expo.",
         "src":  "photos/4.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand Skylane Optics",
+        "description":  "Stand Apresentado na FUTURECOM 2026, São Paulo Expo.",
         "src":  "photos/5.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand Carreira 99",
+        "description":  "Stand Apresentado na SDR MACKENZIE 2026, Em São Paulo.",
         "src":  "photos/6.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand XP INC",
+        "description":  "Stand Apresentado na SDR MACKENZIE 2026, Em São Paulo.",
         "src":  "photos/7.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand Banco ABC Brasil",
+        "description":  "Stand Apresentado na SDR MACKENZIE 2026, Em São Paulo.",
         "src":  "photos/8.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand Bradesco Seguros",
+        "description":  "Stand Apresentado na SDR MACKENZIE 2026, Em São Paulo.",
         "src":  "photos/9.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand Mercedes Bens",
+        "description":  "Stand Apresentado na SDR MACKENZIE 2026, Em São Paulo.",
         "src":  "photos/10.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand Tokio Marine",
+        "description":  "Stand Apresentado na SDR MACKENZIE 2026, Em São Paulo.",
         "src":  "photos/11.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand Viemaq Equipamentos",
+        "description":  "Stand Apresentado na Paving Expo, No Distrito Anhembi São Paulo.",
         "src":  "photos/12.jpeg"
     },
     {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
+        "title":  "Stand AMMANN",
+        "description":  "Stand Apresentado na Paving Expo, No Distrito Anhembi São Paulo.",
         "src":  "photos/13.jpeg"
-    },
-    {
-        "title":  "Projeto 1st Stands",
-        "description":  "Projeto desenvolvido pela equipe 1st Stands.",
-        "src":  "photos/14.jpeg"
     }
 ]
